@@ -18,7 +18,8 @@ logger.debug(`Server running on port: ${process.env.PORT}`);
 Bun.serve({
   port: process.env.PORT,
   fetch: async (req) => {
-    const value = await client.get("key");
+    const value = await client.get("foo");
+    logger.debug(`got '${value}' from Redis`);
     return new Response(`got '${value}' from Redis`);
   },
 });
