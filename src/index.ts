@@ -13,8 +13,6 @@ logger.debug("Redis Client Started!");
 
 await client.set("foo", "bar");
 
-await client.disconnect();
-
 logger.debug(`Server running on port: ${process.env.PORT}`);
 
 Bun.serve({
