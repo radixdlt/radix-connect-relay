@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - prereleased # A release was created and identified as a pre-release.
+      - released # A release was published, or a pre-release was changed to a release.
+
+permissions:
+  id-token: write
+  pull-requests: write
+  contents: read
+  deployments: write
+  packages: write
+
+jobs:
+  setup-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+      - name: Docker tags
+        id: tags
+        uses: RDXWorks-actions/metadata-action@master
+        with:
+          images: |
+            docker.io/radixdlt/radix-connect-relay
+          tags: |
+            type=sha,event=pr
+            type=sha,event=branch
+            type=semver,pattern={{version}}
+    outputs:
+      tags: ${{ steps.tags.outputs.tags }}
+      labels: ${{ steps.tags.outputs.labels }}
+      json: ${{ steps.tags.outputs.json }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - setup-tags
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+
+      - name: Use Node.js
+        uses: RDXWorks-actions/setup-node@main
+        with:
+          node-version: '20.3.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build dependencies
+        run: npm run build:dependencies
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Lint
+        run: npm run lint

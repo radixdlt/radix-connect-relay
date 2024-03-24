@@ -1,0 +1,56 @@
+---
+helmDefaults:
+  verify: false
+  wait: false
+  timeout: 600
+  recreatePods: false
+  force: false
+  createNamespace: false
+
+---
+environments:
+  dev: {}
+  pr: {}
+  prod: {}
+
+---
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: rdx-works
+    url: https://raw.githubusercontent.com/radixdlt/helm-charts/master/
+    username: {{ requiredEnv "HELM_GH_USER" }}
+    password: {{ requiredEnv "HELM_GH_PASS" }}
+releases:
+  - name: radix-connect-relay
+    chart: ./radix-connect-relay/
+    values:
+      - environments/{{ .Environment.Name }}/values.yaml.gotmpl
+
+  - name: redis
+    chart: bitnami/redis
+    version:  18.19.4
+    installed: {{ eq .Environment.Name "pr" }}
+    values:
+      - architecture: standalone
+        auth:
+          enabled: false
+        master:
+          persistence:
+            enabled: false
+          extraFlags: 
+          - "--maxmemory-policy noeviction"
+
+  - name: developer-access
+    chart: rdx-works/developer-access
+    version: 1.0.0
+    values:
+      - project: radix-connect-relay
+      - environments/{{ .Environment.Name }}/developer-access.yaml.gotmpl
+
+  - name: alertmanager
+    chart: rdx-works/alertmanager-configs
+    version: 1.1.0
+    installed: {{ ne .Environment.Name "pr" }}
+    values:
+      - environments/{{ .Environment.Name }}/alertmanager.yaml.gotmpl

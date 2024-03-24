@@ -1,0 +1,23 @@
+image: 
+    tag: {{ .StateValues.ci.tag }}
+
+params:
+  REDIS_HOST: radix-connect-relay-dev-redis.rdx-works-main.internal
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: 
+  PORT: 3000
+
+ingress:
+  enabled: true
+  hosts:
+    - host: radix-connect-relay-dev.rdx-works-main.extratools.works
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 1Gi
+  limits:
+    memory: 1Gi

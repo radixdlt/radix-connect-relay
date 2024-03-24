@@ -1,0 +1,19 @@
+{{- if .Values.metrics.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "radix-connect-relay.serviceAccountName" . }}
+  labels:
+    release: prometheus-operator
+    {{- include "radix-connect-relay.labels" . | nindent 4 }}
+spec:
+  endpoints:
+  - port: metrics
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace | quote }}
+  selector:
+    matchLabels:
+      {{- include "radix-connect-relay.selectorLabels" . | nindent 6 }}
+{{- end }}
