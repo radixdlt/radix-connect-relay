@@ -1,0 +1,8 @@
+deploy/       @radixdlt/devops
+.github/      @radixdlt/devops
+Dockerfile    @radixdlt/devops
+
+src/          @xstelea
+package.json  @xstelea
+tsconfig.json @xstelea
+bun.lockb     @xstelea
