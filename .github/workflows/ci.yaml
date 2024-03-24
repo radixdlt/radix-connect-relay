@@ -46,19 +46,16 @@ jobs:
     steps:
       - uses: RDXWorks-actions/checkout@main
 
-      - name: Use Node.js
-        uses: RDXWorks-actions/setup-node@main
+      - name: Use bun
+        uses: oven-sh/setup-bun@194c60efc37fcfa5fa518543a35a9d2da5fe42a2
         with:
-          node-version: '20.3.0'
+          bun-version: 1.0.x
 
       - name: Install dependencies
-        run: npm install
+        run: bun install --frozen-lockfile
 
-      - name: Build dependencies
-        run: npm run build:dependencies
+      - name: Build
+        run: bun run build --target=bun
 
       - name: Unit tests
-        run: npm run test
-
-      - name: Lint
-        run: npm run lint
+        run: bun test
