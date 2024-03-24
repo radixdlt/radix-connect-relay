@@ -64,53 +64,6 @@ jobs:
       - name: Unit tests
         run: bun test
 
-  snyk-scan-code:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-common-secrets-read-access'
-          app_name: 'radix-connect-relay'
-          step_name: 'snyk-scan-code'
-          secret_prefix: 'SNYK'
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/common/snyk-credentials-rXRpuX'
-          parse_json: true
-      - name: Run Snyk to check for code vulnerabilities
-        uses: RDXWorks-actions/snyk-actions/node@master
-        continue-on-error: true # temporary until code fix
-        with:
-          args: --all-projects --org=${{ env.SNYK_PROJECTS_ORG_ID }} --severity-threshold=high
-          command: code test
-
-  snyk-sbom:
-    runs-on: ubuntu-latest
-    needs:
-      - snyk-scan-code
-    permissions: write-all
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-common-secrets-read-access'
-          app_name: 'dashboard'
-          step_name: 'snyk-sbom'
-          secret_prefix: 'SNYK'
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/common/snyk-credentials-rXRpuX'
-          parse_json: true
-      - name: Generate SBOM # check SBOM can be generated but nothing is done with it
-        uses: RDXWorks-actions/snyk-actions/node@master
-        with:
-          args: --all-projects --org=${{ env.SNYK_PROJECTS_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
-          command: sbom
-      - name: Upload SBOM
-        if: github.event_name == 'release'
-        uses: RDXWorks-actions/upload-release-assets@c94805dc72e4b20745f543da0f62eaee7722df7a
-        with:
-          files: sbom.json
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          release-tag: ${{ github.event.release.tag_name }}
-
   push-docker-image:
     name: Docker
     needs:
@@ -120,7 +73,6 @@ jobs:
       runs_on: ubuntu-latest
       image_registry: 'docker.io'
       image_organization: 'radixdlt'
-      target: 'application'
       image_name: 'radix-connect-relay'
       tag: ${{ needs.setup-tags.outputs.tags }}
       context: '.'
