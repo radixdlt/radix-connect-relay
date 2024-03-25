@@ -1,0 +1,8 @@
+alertmanager:
+  env: "dev"
+  nameOverride: "radix-connect-relay-amcfg"
+  slackConfig:
+    channel: "feed--alerts-radix-connect-relay-dev"
+  secrets:
+    region: eu-west-2
+    name: "rdx-works-main-dev/eks/radix-connect-relay/dev/alertmanager-integration-keys"

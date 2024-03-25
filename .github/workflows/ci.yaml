@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - prereleased # A release was created and identified as a pre-release.
+      - released # A release was published, or a pre-release was changed to a release.
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  pull-requests: write
+  contents: read
+  deployments: write
+  packages: write
+
+jobs:
+  setup-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+      - name: Docker tags
+        id: tags
+        uses: RDXWorks-actions/metadata-action@master
+        with:
+          images: |
+            docker.io/radixdlt/radix-connect-relay
+          tags: |
+            type=sha,event=pr
+            type=sha,event=branch
+            type=semver,pattern={{version}}
+    outputs:
+      tags: ${{ steps.tags.outputs.tags }}
+      labels: ${{ steps.tags.outputs.labels }}
+      json: ${{ steps.tags.outputs.json }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - setup-tags
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+
+      - name: Use bun
+        uses: oven-sh/setup-bun@194c60efc37fcfa5fa518543a35a9d2da5fe42a2
+        with:
+          bun-version: 1.0.x
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build --target=bun
+
+      - name: Unit tests
+        run: bun test
+
+  push-docker-image:
+    name: Docker
+    needs:
+      - setup-tags
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
+    with:
+      runs_on: ubuntu-latest
+      image_registry: 'docker.io'
+      image_organization: 'radixdlt'
+      image_name: 'radix-connect-relay'
+      tag: ${{ needs.setup-tags.outputs.tags }}
+      context: '.'
+      dockerfile: 'Dockerfile'
+      platforms: 'linux/amd64'
+      scan_image: true
+      provenance: false
+      snyk_target_ref: ${{ github.ref_name }}
+      with_sbom: false
+
+  deploy-pull-request:
+    if: ${{ github.event.pull_request }}
+    name: "Deploy PR"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    needs:
+      - setup-tags
+      - push-docker-image
+    with:
+      env_name: pr
+      hierarchical_namespace: radix-connect-relay-ci-pr
+      namespace: radix-connect-relay-pr-${{ github.event.number }}
+      helm_command: "apply"
+      create_subns: true
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: 'arn:aws:iam::308190735829:role/gh-radix-connect-relay-pr-deployer'
+      eks_cluster: rdx-works-main-dev
+      helm_folder: "deploy/helm/"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.prNumber=${{ github.event.number }}
+      app_name: 'radix-connect-relay'
+      step_name: 'deploy-pr'
+
+  deploy-dev:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    name: "Deploy DEV"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    needs:
+      - setup-tags
+      - push-docker-image
+    with:
+      app_name: 'radix-connect-relay'
+      step_name: 'deploy-radix-connect-relay-dev'
+      env_name: dev
+      namespace: radix-connect-relay-dev
+      helm_command: "apply"
+      create_subns: false
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: arn:aws:iam::308190735829:role/gh-radix-connect-relay-dev-deployer
+      eks_cluster: rdx-works-main-dev
+      helm_folder: "deploy/helm"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.environment=dev,
+        ci.HF_CREATE_NAMESPACES=false
+
+  deploy-prod:
+    if: github.event_name == 'release' && github.event.action == 'released'
+    name: "Deploy PROD"
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    needs:
+      - setup-tags
+      - push-docker-image
+    with:
+      app_name: 'radix-connect-relay'
+      step_name: 'deploy-radix-connect-relay-prod'
+      env_name: prod
+      namespace: radix-connect-relay-prod
+      helm_command: "apply"
+      create_subns: false
+      restart_pods: false
+      aws_region: eu-west-2
+      role_to_assume: arn:aws:iam::308190735829:role/gh-radix-connect-relay-prod-deployer
+      eks_cluster: rdx-works-main-prod
+      helm_folder: "deploy/helm"
+      helmfile_extra_vars: >-
+        ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
+        ci.environment=prod,
+        ci.HF_CREATE_NAMESPACES=false

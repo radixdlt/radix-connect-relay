@@ -1,0 +1,72 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/radixdlt/radix-connect-relay
+  pullPolicy: Always
+  tag: ""
+
+imagePullSecrets:
+  - name: dockerhub
+
+nameOverride: "radix-connect-relay"
+fullnameOverride: "radix-connect-relay"
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: "radix-connect-relay"
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts: []
+  tls: []
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+volumes: []
+
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+params: []
+
+secrets: []
+
+metrics:
+  enabled: false
+  port: 9209
