@@ -25,6 +25,7 @@ permissions:
 
 jobs:
   setup-tags:
+    name: "Setup tags"
     runs-on: ubuntu-latest
     steps:
       - uses: RDXWorks-actions/checkout@main
@@ -44,6 +45,7 @@ jobs:
       json: ${{ steps.tags.outputs.json }}
 
   build:
+    name: "Build"
     runs-on: ubuntu-latest
     needs:
       - setup-tags
