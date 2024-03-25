@@ -5,6 +5,9 @@ image:
   pullPolicy: Always
   tag: ""
 
+docker:
+  secret_name: docker.io/radixdlt
+
 imagePullSecrets:
   - name: dockerhub
 
