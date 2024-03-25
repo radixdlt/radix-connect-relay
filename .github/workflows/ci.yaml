@@ -68,15 +68,16 @@ jobs:
 
   push-docker-image:
     name: Docker
-    needs:
-      - setup-tags
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
     with:
       runs_on: ubuntu-latest
       image_registry: 'docker.io'
       image_organization: 'radixdlt'
       image_name: 'radix-connect-relay'
-      tag: ${{ needs.setup-tags.outputs.tags }}
+      tags: |
+          type=sha,event=pr
+          type=sha,event=branch
+          type=semver,pattern={{version}}
       context: '.'
       dockerfile: 'Dockerfile'
       platforms: 'linux/amd64'
