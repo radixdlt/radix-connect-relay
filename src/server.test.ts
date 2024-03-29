@@ -1,11 +1,28 @@
 import { describe, expect, it } from "vitest";
 import config from "./config";
-import { redis } from "./redis";
-import { logger } from "./logger";
-import "./index";
 import { Model } from "./model";
+import { RedisServer } from "./test-helpers/inMemoryRedisServer";
+import { Server } from "./server";
+import { Redis } from "./redis";
+import { Controller } from "./controller";
+import { Router } from "./router";
 
 const apiBaseUrl = `http://localhost:${config.port}`;
+
+const inMemoryRedis = await RedisServer();
+
+await Server({
+  port: config.port,
+  redis: { url: inMemoryRedis.url, password: "" },
+});
+
+const redis = await Redis({ url: inMemoryRedis.url, password: "" });
+
+const model = Model({ redis });
+
+const controller = Controller({ model });
+
+const router = Router({ controller });
 
 const generateRandomValue = (len = 8192) =>
   Buffer.from(crypto.getRandomValues(new Uint8Array(len))).toString("hex");
@@ -23,12 +40,11 @@ describe("API", () => {
   describe("/api/v1", () => {
     const url = `${apiBaseUrl}/api/v1`;
     describe("sendRequest", () => {
-      it.only("should set request", async () => {
+      it("should set request", async () => {
         const request = {
           method: "sendRequest",
           ...createItem(),
         };
-
         const response = await fetch(`${url}`, {
           method: "POST",
           body: JSON.stringify(request),
@@ -36,36 +52,30 @@ describe("API", () => {
           data: await res.json(),
           status: res.status,
         }));
-
         expect(response).toEqual({ status: 200, data: { ok: true } });
-        expect(await Model().get(`${request.sessionId}:requests`)).toEqual([
+        expect(await model.get(`${request.sessionId}:requests`)).toEqual([
           request.data,
         ]);
-        expect(await Model().get(`${request.sessionId}:requests`)).toEqual([]);
+        expect(await model.get(`${request.sessionId}:requests`)).toEqual([]);
       });
-
-      it("should return requests", async () => {
+      it.skip("should return requests", async () => {
         const sessionId = generateSessionId();
         const data1 = {
           method: "sendRequest",
           ...createItem(sessionId),
         };
-
         const data2 = {
           method: "sendRequest",
           ...createItem(sessionId),
         };
-
         await fetch(`${url}`, {
           method: "POST",
           body: JSON.stringify(data1),
         });
-
         await fetch(`${url}`, {
           method: "POST",
           body: JSON.stringify(data2),
         });
-
         const response = await fetch(`${url}`, {
           method: "POST",
           body: JSON.stringify({ method: "getRequests" }),
@@ -73,12 +83,10 @@ describe("API", () => {
           data: await res.json(),
           status: res.status,
         }));
-
         expect(response).toBe({});
       });
     });
   });
-
   describe("error responses", () => {
     it("should return 404", async () => {
       const response = await fetch(apiBaseUrl, { method: "GET" });

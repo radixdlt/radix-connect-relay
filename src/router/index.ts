@@ -1,13 +1,13 @@
-import { z } from "zod";
-import { Controller } from "../controller";
+import type { Controller } from "../controller";
 import { logger } from "../logger";
 import { invalidRequest } from "./helpers/invalidRequest";
 import { notFoundResponse } from "./helpers/notFoundResponse";
 import { routeHandler } from "./helpers/routeHandler";
-import { ApiV1Requests, SendRequestBody } from "../schemas";
+import { ApiV1Requests } from "../schemas";
 import { getRequestBody } from "./helpers/getJson";
 
-export default (controller = Controller()) =>
+export const Router =
+  ({ controller }: { controller: Controller }) =>
   async (req: Request): Promise<Response> => {
     const url = new URL(req.url);
     const path = url.pathname;

@@ -1,10 +1,11 @@
 import { createClient } from "redis";
 import { logger } from "./logger";
-import config from "./config";
 
-export const redis = await createClient({
-  url: config.redis.url,
-  password: process.env.REDIS_PASSWORD,
-})
-  .on("error", (err) => logger.error("Redis Client Error", err))
-  .connect();
+export type Redis = ReturnType<typeof createClient>;
+export const Redis = ({ url, password }: { url: string; password: string }) =>
+  createClient({
+    url,
+    password,
+  })
+    .on("error", (err) => logger.error("Redis Client Error", err))
+    .connect();
