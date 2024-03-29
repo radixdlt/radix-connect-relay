@@ -7,12 +7,12 @@ import { Redis } from "./redis";
 import { Controller } from "./controller";
 import { Router } from "./router";
 
-const apiBaseUrl = `http://localhost:${config.port}`;
+const apiBaseUrl = `http://localhost:3001`;
 
 const inMemoryRedis = await RedisServer();
 
 await Server({
-  port: config.port,
+  port: "3001",
   redis: { url: inMemoryRedis.url, password: "" },
 });
 
