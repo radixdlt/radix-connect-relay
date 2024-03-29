@@ -1,25 +1,14 @@
-import { createClient } from "redis";
-import Pino from "pino";
+import config from "./config";
+import { logger } from "./logger";
+import Router from "./router";
 
-const logger = Pino({ level: "debug" });
+export const server = () => {
+  Bun.serve({
+    port: config.port,
+    fetch: Router(),
+  });
 
-const client = await createClient({
-  url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
-})
-  .on("error", (err) => logger.error("Redis Client Error", err))
-  .connect();
+  logger.debug(`Server running on: http://localhost:${process.env.PORT}`);
+};
 
-logger.debug("Redis Client Started!");
-
-await client.set("foo", "bar");
-
-logger.debug(`Server running on port: ${process.env.PORT}`);
-
-Bun.serve({
-  port: process.env.PORT,
-  fetch: async (req) => {
-    const value = await client.get("foo");
-    logger.debug(`got '${value}' from Redis`);
-    return new Response(`got '${value}' from Redis`);
-  },
-});
+server();
