@@ -10,22 +10,22 @@ export type Controller = ReturnType<typeof Controller>;
 export const Controller = ({ model }: { model: Model }) => {
   const addRequest = async ({ data, sessionId }: SendRequestBody) => {
     await model.add(`${sessionId}:requests`, data);
-    return { data: { ok: true }, status: 200 };
+    return { method: "sendRequest", data: { ok: true }, status: 200 };
   };
 
   const getRequests = async ({ sessionId }: GetRequestsBody) => {
     const data = await model.get(`${sessionId}:requests`);
-    return { data, status: 200 };
+    return { method: "getRequests", data, status: 200 };
   };
 
   const addResponse = async ({ data, sessionId }: SendResponseBody) => {
     await model.add(`${sessionId}:responses`, data);
-    return { data: { ok: true }, status: 200 };
+    return { method: "sendResponse", data: { ok: true }, status: 200 };
   };
 
   const getResponses = async ({ sessionId }: GetResponsesBody) => {
     const data = await model.get(`${sessionId}:responses`);
-    return { data, status: 200 };
+    return { method: "getResponses", data, status: 200 };
   };
 
   return { addRequest, getRequests, addResponse, getResponses };
