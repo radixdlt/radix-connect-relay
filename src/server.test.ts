@@ -1,5 +1,4 @@
-import { describe, expect, it } from "vitest";
-import config from "./config";
+import { describe, expect, it } from "bun:test";
 import { Model } from "./model";
 import { RedisServer } from "./test-helpers/inMemoryRedisServer";
 import { Server } from "./server";
