@@ -12,6 +12,8 @@ export const Router =
     const url = new URL(req.url);
     const path = url.pathname;
 
+    if (path === "/") return new Response("OK", { status: 200 });
+
     const isAllowedMethod = req.method === "POST";
     const isAllowedPath = ["/api/v1"].includes(path);
 

@@ -267,10 +267,10 @@ describe("API", () => {
       });
     });
   });
-  describe("error responses", () => {
-    it("should return 404", async () => {
+  describe("healthcheck", () => {
+    it("should return 200", async () => {
       const response = await fetch(apiBaseUrl, { method: "GET" });
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(200);
     });
   });
 });
