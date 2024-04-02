@@ -32,9 +32,15 @@ export const Router =
 
     const data = parsedRequestBody.data;
 
-    if (data.method === "sendRequest") {
-      const result = await controller.addRequest(data);
-      return routeHandler(result);
+    switch (data.method) {
+      case "sendRequest":
+        return routeHandler(await controller.addRequest(data));
+      case "getRequests":
+        return routeHandler(await controller.getRequests(data));
+      case "sendResponse":
+        return routeHandler(await controller.addResponse(data));
+      case "getResponses":
+        return routeHandler(await controller.getResponses(data));
     }
 
     return notFoundResponse;
