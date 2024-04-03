@@ -10,6 +10,7 @@ import {
   addResponseCounter,
   getRequestsCounter,
   getResponsesCounter,
+  requestSizeHistogram,
 } from "../metrics/metrics";
 
 export const Router =
@@ -24,6 +25,9 @@ export const Router =
     if (!isAllowedMethod || !isAllowedPath) return notFoundResponse;
 
     const rawRequestBody = await getRequestBody(req);
+
+    requestSizeHistogram.observe(JSON.stringify(rawRequestBody).length);
+
     if (rawRequestBody.error) return invalidRequest;
 
     const parsedRequestBody = await ApiV1Requests.safeParseAsync(

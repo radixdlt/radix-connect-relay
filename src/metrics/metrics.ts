@@ -35,5 +35,17 @@ export const redisDeleteTime = new client.Gauge({
   help: "The time it takes in milliseconds for redis to delete value",
 });
 
+export const requestSizeHistogram = new client.Histogram({
+  name: "radix_connect_relay_request_size_bytes",
+  help: "The size of the requests in bytes",
+  buckets: client.linearBuckets(20000, 20000, 50),
+});
+
+export const responseSizeHistogram = new client.Histogram({
+  name: "radix_connect_relay_response_size_bytes",
+  help: "The size of the response in bytes",
+  buckets: client.linearBuckets(20000, 20000, 50),
+});
+
 // TODO: Uncomment when `prom-client` is not throwing errors
 // client.collectDefaultMetrics();
