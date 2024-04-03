@@ -175,3 +175,58 @@ When anything other than `POST /api/v1` or `GET /` is requested
 </tr>
 
 </table>
+
+## Internal Server
+
+Used for health check and collecting metrics
+
+<table>
+<tr>
+  <td><strong>Name</strong></td>
+  <td><strong>Response</strong></td>
+</tr>
+<tr>
+  <td>
+  
+  <strong>Health `GET /`</strong></td>
+<td>
+
+```OK```
+
+</td>
+</tr>
+<tr>
+  <td>
+  
+  <strong>Metrics `GET /metrics`</strong></td>
+<td>
+
+*Prometheus metrics*
+
+</td>
+</tr>
+</table>
+
+
+### Error responses
+<table>
+<tr>
+<td><strong>HTTP Code</strog></td>
+<td><strong>Response</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td><strong>404</strong></td>
+<td>
+
+```json
+{ "error": "Not Found" }
+```
+</td>
+<td>
+
+When anything other than `GET /` or `GET /metrics` is requested
+</td>
+</tr>
+
+</table>

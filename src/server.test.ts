@@ -267,10 +267,4 @@ describe("API", () => {
       });
     });
   });
-  describe("healthcheck", () => {
-    it("should return 200", async () => {
-      const response = await fetch(apiBaseUrl, { method: "GET" });
-      expect(response.status).toBe(200);
-    });
-  });
 });
