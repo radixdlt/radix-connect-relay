@@ -43,11 +43,11 @@ resources: {}
 livenessProbe:
   httpGet:
     path: /
-    port: http
+    port: metrics
 readinessProbe:
   httpGet:
     path: /
-    port: http
+    port: metrics
 
 autoscaling:
   enabled: false
@@ -71,5 +71,5 @@ params: []
 secrets: []
 
 metrics:
-  enabled: false
-  port: 9209
+  enabled: true
+  port: 3001
