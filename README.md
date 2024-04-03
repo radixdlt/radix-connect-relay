@@ -125,18 +125,6 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 ```
 
 </td>
-</tr>
-<tr>
-  <td>
-  
-  <strong>Health `GET /`</strong></td>
-  <td>-</td>
-<td>
-
-```OK```
-
-</td>
-</tr>
 </table>
 
 
