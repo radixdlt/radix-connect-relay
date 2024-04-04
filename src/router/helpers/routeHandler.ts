@@ -7,6 +7,8 @@ export const routeHandler = ({ data, status }: { data?: any; status: number }) =
     status: status,
     headers: {
       "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST",
     },
   });
 };
