@@ -5,6 +5,13 @@ import { notFoundResponse } from "./helpers/notFoundResponse";
 import { routeHandler } from "./helpers/routeHandler";
 import { ApiV1Requests } from "../schemas";
 import { getRequestBody } from "./helpers/getJson";
+import {
+  addRequestCounter,
+  addResponseCounter,
+  getRequestsCounter,
+  getResponsesCounter,
+  requestSizeHistogram,
+} from "../metrics/metrics";
 
 export const Router =
   ({ controller }: { controller: Controller }) =>
@@ -12,14 +19,15 @@ export const Router =
     const url = new URL(req.url);
     const path = url.pathname;
 
-    if (path === "/") return new Response("OK", { status: 200 });
-
     const isAllowedMethod = req.method === "POST";
     const isAllowedPath = ["/api/v1"].includes(path);
 
     if (!isAllowedMethod || !isAllowedPath) return notFoundResponse;
 
     const rawRequestBody = await getRequestBody(req);
+
+    requestSizeHistogram.observe(JSON.stringify(rawRequestBody).length);
+
     if (rawRequestBody.error) return invalidRequest;
 
     const parsedRequestBody = await ApiV1Requests.safeParseAsync(
@@ -36,12 +44,16 @@ export const Router =
 
     switch (data.method) {
       case "sendRequest":
+        addRequestCounter.inc();
         return routeHandler(await controller.addRequest(data));
       case "getRequests":
+        getRequestsCounter.inc();
         return routeHandler(await controller.getRequests(data));
       case "sendResponse":
+        addResponseCounter.inc();
         return routeHandler(await controller.addResponse(data));
       case "getResponses":
+        getResponsesCounter.inc();
         return routeHandler(await controller.getResponses(data));
     }
 

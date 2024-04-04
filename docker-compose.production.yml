@@ -8,10 +8,13 @@ services:
       target: release
     expose:
       - "3000"
+      - "3001"
     ports:
       - "3000:3000"
+      - "3001:3001"
     environment:
       - PORT=${PORT}
+      - INTERNAL_PORT=${INTERNAL_PORT}
       - REDIS_HOST=redis
       - REDIS_PORT=${REDIS_PORT}
     command: bun run src/index.ts
