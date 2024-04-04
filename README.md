@@ -26,7 +26,8 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 <tr>
   <td><strong>Name</strong></td>
   <td><strong>Request Body</strong></td>
-  <td><strong>Response</strong></td>
+  <td><strong>Response Status</strong></td>
+  <td><strong>Response Body</strong></td>
 </tr>
 <tr>
   <td><strong>Send Request</strong></td>
@@ -40,19 +41,9 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 }
 ```
 </td>
-<td>
-
-```json
-{
-  "method": "sendRequest",
-  "data": {
-    "ok": true
-  },
-  "status": 200
-}
-```
-
+<td><strong>201</strong>
 </td>
+<td><i>empty</i></td>
 </tr>
 <tr>
   <td><strong>Get Requests</strong></td>
@@ -65,16 +56,13 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 }
 ```
 </td>
+<td><strong>200</strong></td>
 <td>
 
-```json
-{
-  "method": "getRequests",
-  "data": ["string", "string"],
-  "status": 200
-}
-```
 
+```json
+["string", "string"]
+```
 </td>
 </tr>
 <tr>
@@ -89,19 +77,8 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 }
 ```
 </td>
-<td>
-
-```json
-{
-  "method": "sendResponse",
-  "data": {
-    "ok": true
-  },
-  "status": 200
-}
-```
-
-</td>
+<td><strong>201</strong></td>
+<td><i>empty</i></td>
 </tr>
 <tr>
   <td><strong>Get Responses</strong></td>
@@ -114,16 +91,12 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 }
 ```
 </td>
+<td><strong>200</strong></td>
 <td>
 
 ```json
-{
-  "method": "getResponses",
-  "data": ["string", "string"],
-  "status": 200
-}
+["string", "string"]
 ```
-
 </td>
 </table>
 

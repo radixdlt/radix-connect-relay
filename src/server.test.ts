@@ -83,10 +83,10 @@ describe("API", () => {
       let getRequests: jest.Mock;
       let getResponses: jest.Mock;
       beforeEach(() => {
-        addRequest = jest.fn().mockResolvedValue({ ok: true });
-        addResponse = jest.fn().mockResolvedValue({ ok: true });
-        getRequests = jest.fn().mockResolvedValue({ data: [] });
-        getResponses = jest.fn().mockResolvedValue({ data: [] });
+        addRequest = jest.fn().mockResolvedValue({ status: 201 });
+        addResponse = jest.fn().mockResolvedValue({ status: 201 });
+        getRequests = jest.fn().mockResolvedValue({ data: [], status: 200 });
+        getResponses = jest.fn().mockResolvedValue({ data: [], status: 200 });
 
         mockedControllerRouter = Router({
           controller: {
@@ -173,7 +173,7 @@ describe("API", () => {
           data: await res.json(),
           status: res.status,
         }));
-        expect(response).toEqual({ status: 200, data: { ok: true } });
+        expect(response).toEqual({ status: 201, data: null });
         expect(await model.get(`${request.sessionId}:requests`)).toEqual([
           request.data,
         ]);
@@ -225,7 +225,7 @@ describe("API", () => {
           data: await res.json(),
           status: res.status,
         }));
-        expect(response).toEqual({ status: 200, data: { ok: true } });
+        expect(response).toEqual({ status: 201, data: null });
         expect(await model.get(`${request.sessionId}:responses`)).toEqual([
           request.data,
         ]);
