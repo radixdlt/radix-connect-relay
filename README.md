@@ -40,18 +40,7 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 }
 ```
 </td>
-<td>
-
-```json
-{
-  "method": "sendRequest",
-  "data": {
-    "ok": true
-  },
-  "status": 200
-}
-```
-
+<td><strong>OK 201</strong>
 </td>
 </tr>
 <tr>
@@ -68,11 +57,7 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 <td>
 
 ```json
-{
-  "method": "getRequests",
-  "data": ["string", "string"],
-  "status": 200
-}
+["string", "string"]
 ```
 
 </td>
@@ -89,19 +74,7 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 }
 ```
 </td>
-<td>
-
-```json
-{
-  "method": "sendResponse",
-  "data": {
-    "ok": true
-  },
-  "status": 200
-}
-```
-
-</td>
+<td><strong>OK 201</strong></td>
 </tr>
 <tr>
   <td><strong>Get Responses</strong></td>
@@ -117,11 +90,7 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 <td>
 
 ```json
-{
-  "method": "getResponses",
-  "data": ["string", "string"],
-  "status": 200
-}
+["string", "string"]
 ```
 
 </td>
