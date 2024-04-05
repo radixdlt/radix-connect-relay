@@ -15,19 +15,19 @@ export const Model = ({ redis }: { redis: Redis }) => {
       redis.expire(key, config.redis.TTL),
     ]);
     const t1 = performance.now();
-    redisSetTime.set(t1 - t0);
+    redisSetTime.observe(t1 - t0);
   };
 
   const get = async (key: string) => {
     const t0 = performance.now();
     const value = await redis.sMembers(key);
     const t1 = performance.now();
-    redisGetKeyTime.set(t1 - t0);
+    redisGetKeyTime.observe(t1 - t0);
     if (value.length) {
       const t0 = performance.now();
       await redis.del(key);
       const t1 = performance.now();
-      redisDeleteTime.set(t1 - t0);
+      redisDeleteTime.observe(t1 - t0);
     }
     return value;
   };
