@@ -44,11 +44,11 @@ const createItem = (
 
 const createHandshakeRequest = (
   sessionId = generateSessionId(),
-  publicKey = generateRandomValue(32)
+  data = generateRandomValue(32)
 ) => {
   return {
     sessionId,
-    publicKey,
+    data,
   };
 };
 
@@ -317,7 +317,7 @@ describe("API", () => {
           await controller.getHandshakeRequest(getHandshakeRequestBody)
         ).toEqual({
           status: 200,
-          data: { publicKey: sendHandshakeRequestBody.publicKey },
+          data: { publicKey: sendHandshakeRequestBody.data },
         });
 
         // Should return undefined after reading
@@ -336,7 +336,7 @@ describe("API", () => {
           await controller.getHandshakeResponse(getHandshakeResponseBody)
         ).toEqual({
           status: 200,
-          data: { publicKey: sendHandshakeResponseBody.publicKey },
+          data: { publicKey: sendHandshakeResponseBody.data },
         });
 
         // Should return undefined after reading

@@ -111,7 +111,7 @@ string[]
 {
   method: "sendHandshakeRequest",
   sessionId: string,
-  publicKey: string
+  data: string
 }
 ```
 
@@ -150,7 +150,7 @@ string[]
 {
   method: "sendHandshakeResponse",
   sessionId: string,
-  publicKey: string
+  data: string
 }
 ```
 
