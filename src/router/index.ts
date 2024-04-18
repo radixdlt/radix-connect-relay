@@ -6,8 +6,12 @@ import { routeHandler } from "./helpers/routeHandler";
 import { ApiV1Requests } from "../schemas";
 import { getRequestBody } from "./helpers/getJson";
 import {
+  addHandshakeRequestCounter,
+  addHandshakeResponseCounter,
   addRequestCounter,
   addResponseCounter,
+  getHandshakeRequestCounter,
+  getHandshakeResponseCounter,
   getRequestsCounter,
   getResponsesCounter,
   requestSizeHistogram,
@@ -55,6 +59,18 @@ export const Router =
       case "getResponses":
         getResponsesCounter.inc();
         return routeHandler(await controller.getResponses(data));
+      case "sendHandshakeRequest":
+        addHandshakeRequestCounter.inc();
+        return routeHandler(await controller.addHandshakeRequest(data));
+      case "getHandshakeRequest":
+        getHandshakeRequestCounter.inc();
+        return routeHandler(await controller.getHandshakeRequest(data));
+      case "sendHandshakeResponse":
+        addHandshakeResponseCounter.inc();
+        return routeHandler(await controller.addHandshakeResponse(data));
+      case "getHandshakeResponse":
+        getHandshakeResponseCounter.inc();
+        return routeHandler(await controller.getHandshakeResponse(data));
     }
 
     return notFoundResponse;

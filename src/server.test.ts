@@ -5,6 +5,12 @@ import { Server } from "./server";
 import { Redis } from "./redis";
 import { Controller } from "./controller";
 import { Router } from "./router";
+import type {
+  GetHandshakeRequestBody,
+  GetHandshakeResponseBody,
+  SendHandshakeRequestBody,
+  SendHandshakeResponseBody,
+} from "./schemas";
 
 const apiBaseUrl = `http://localhost:3001`;
 
@@ -33,6 +39,16 @@ const createItem = (
   return {
     sessionId,
     data,
+  };
+};
+
+const createHandshakeRequest = (
+  sessionId = generateSessionId(),
+  publicKey = generateRandomValue(32)
+) => {
+  return {
+    sessionId,
+    publicKey,
   };
 };
 
@@ -174,10 +190,12 @@ describe("API", () => {
           status: res.status,
         }));
         expect(response).toEqual({ status: 201, data: null });
-        expect(await model.get(`${request.sessionId}:requests`)).toEqual([
+        expect(await model.getItems(`${request.sessionId}:requests`)).toEqual([
           request.data,
         ]);
-        expect(await model.get(`${request.sessionId}:requests`)).toEqual([]);
+        expect(await model.getItems(`${request.sessionId}:requests`)).toEqual(
+          []
+        );
       });
       it("should return requests", async () => {
         const sessionId = generateSessionId();
@@ -226,10 +244,12 @@ describe("API", () => {
           status: res.status,
         }));
         expect(response).toEqual({ status: 201, data: null });
-        expect(await model.get(`${request.sessionId}:responses`)).toEqual([
+        expect(await model.getItems(`${request.sessionId}:responses`)).toEqual([
           request.data,
         ]);
-        expect(await model.get(`${request.sessionId}:responses`)).toEqual([]);
+        expect(await model.getItems(`${request.sessionId}:responses`)).toEqual(
+          []
+        );
       });
     });
 
@@ -263,6 +283,68 @@ describe("API", () => {
         expect(response).toEqual({
           data: [randomData1, randomData2],
           status: 200,
+        });
+      });
+    });
+
+    describe("handshake", () => {
+      const sendHandshakeRequestBody = {
+        method: "sendHandshakeRequest",
+        ...createHandshakeRequest(),
+      } satisfies SendHandshakeRequestBody;
+
+      const getHandshakeRequestBody = {
+        method: "getHandshakeRequest",
+        sessionId: sendHandshakeRequestBody.sessionId,
+      } satisfies GetHandshakeRequestBody;
+
+      const sendHandshakeResponseBody = {
+        method: "sendHandshakeResponse",
+        ...createHandshakeRequest(),
+      } satisfies SendHandshakeResponseBody;
+
+      const getHandshakeResponseBody = {
+        method: "getHandshakeResponse",
+        sessionId: sendHandshakeResponseBody.sessionId,
+      } satisfies GetHandshakeResponseBody;
+
+      it("should handle handshake flow", async () => {
+        expect(
+          await controller.addHandshakeRequest(sendHandshakeRequestBody)
+        ).toEqual({ status: 201 });
+
+        expect(
+          await controller.getHandshakeRequest(getHandshakeRequestBody)
+        ).toEqual({
+          status: 200,
+          data: { publicKey: sendHandshakeRequestBody.publicKey },
+        });
+
+        // Should return undefined after reading
+        expect(
+          await controller.getHandshakeRequest(getHandshakeRequestBody)
+        ).toEqual({
+          status: 200,
+          data: { publicKey: undefined },
+        });
+
+        expect(
+          await controller.addHandshakeResponse(sendHandshakeResponseBody)
+        ).toEqual({ status: 201 });
+
+        expect(
+          await controller.getHandshakeResponse(getHandshakeResponseBody)
+        ).toEqual({
+          status: 200,
+          data: { publicKey: sendHandshakeResponseBody.publicKey },
+        });
+
+        // Should return undefined after reading
+        expect(
+          await controller.getHandshakeResponse(getHandshakeResponseBody)
+        ).toEqual({
+          status: 200,
+          data: { publicKey: undefined },
         });
       });
     });

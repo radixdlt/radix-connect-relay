@@ -20,6 +20,26 @@ export const getRequestsCounter = new client.Counter({
   help: "The number of requests to get relay requests",
 });
 
+export const addHandshakeRequestCounter = new client.Counter({
+  name: "radix_connect_relay_add_handshake_request_counter",
+  help: "The number of added handshake requests",
+});
+
+export const getHandshakeRequestCounter = new client.Counter({
+  name: "radix_connect_relay_get_handshake_request_counter",
+  help: "The number of requests to get relay request",
+});
+
+export const addHandshakeResponseCounter = new client.Counter({
+  name: "radix_connect_relay_add_handshake_response_counter",
+  help: "The number of added handshake responses",
+});
+
+export const getHandshakeResponseCounter = new client.Counter({
+  name: "radix_connect_relay_get_handshake_response_counter",
+  help: "The number of responses to get relay response",
+});
+
 export const redisGetKeyTime = new client.Histogram({
   name: "radix_connect_relay_redis_get_time",
   help: "The time it takes in milliseconds for redis to get value",

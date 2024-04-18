@@ -1,7 +1,11 @@
 import { Model } from "./model";
 import type {
+  GetHandshakeRequestBody,
+  GetHandshakeResponseBody,
   GetRequestsBody,
   GetResponsesBody,
+  SendHandshakeRequestBody,
+  SendHandshakeResponseBody,
   SendRequestBody,
   SendResponseBody,
 } from "./schemas";
@@ -9,24 +13,63 @@ import type {
 export type Controller = ReturnType<typeof Controller>;
 export const Controller = ({ model }: { model: Model }) => {
   const addRequest = async ({ data, sessionId }: SendRequestBody) => {
-    await model.add(`${sessionId}:requests`, data);
+    await model.setItem(`${sessionId}:requests`, data);
     return { status: 201 };
   };
 
   const getRequests = async ({ sessionId }: GetRequestsBody) => {
-    const data = await model.get(`${sessionId}:requests`);
+    const data = await model.getItems(`${sessionId}:requests`);
     return { data, status: 200 };
   };
 
   const addResponse = async ({ data, sessionId }: SendResponseBody) => {
-    await model.add(`${sessionId}:responses`, data);
+    await model.setItem(`${sessionId}:responses`, data);
     return { status: 201 };
   };
 
   const getResponses = async ({ sessionId }: GetResponsesBody) => {
-    const data = await model.get(`${sessionId}:responses`);
+    const data = await model.getItems(`${sessionId}:responses`);
     return { data, status: 200 };
   };
 
-  return { addRequest, getRequests, addResponse, getResponses };
+  const addHandshakeRequest = async ({
+    publicKey,
+    sessionId,
+  }: SendHandshakeRequestBody) => {
+    await model.set(`${sessionId}:handshake:request`, publicKey);
+    return { status: 201 };
+  };
+
+  const getHandshakeRequest = async ({
+    sessionId,
+  }: GetHandshakeRequestBody) => {
+    const publicKey = await model.get(`${sessionId}:handshake:request`);
+    return { data: { publicKey }, status: 200 };
+  };
+
+  const addHandshakeResponse = async ({
+    publicKey,
+    sessionId,
+  }: SendHandshakeResponseBody) => {
+    await model.set(`${sessionId}:handshake:response`, publicKey);
+    return { status: 201 };
+  };
+
+  const getHandshakeResponse = async ({
+    sessionId,
+  }: GetHandshakeResponseBody) => {
+    const publicKey = await model.get(`${sessionId}:handshake:response`);
+    return { data: { publicKey }, status: 200 };
+  };
+
+  return {
+    addRequest,
+    getRequests,
+    addResponse,
+    getResponses,
+    addHandshakeRequest,
+    getHandshakeRequest,
+    addHandshakeResponse,
+    getHandshakeResponse,
+  };
 };

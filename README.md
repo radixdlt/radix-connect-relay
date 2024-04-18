@@ -15,7 +15,6 @@ docker compose -f docker-compose.yml up
 bun run dev
 ```
 
-
 ## API v1
 
 The Radix Connect Relay only supports the `POST /api/v1` endpoint. The server executes code based on the `method` key in the request body. Multiple requests and responses can be stored for a single `sessionId`. As a result, the `data` field in the response for `getRequests` and `getResponses` is an array of strings.
@@ -33,13 +32,14 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
   <td><strong>Send Request</strong></td>
   <td>
 
-```json
+```typescript
 {
-  "method": "sendRequest",
-  "sessionId": "string",
-  "data": "string"
+  method: "sendRequest",
+  sessionId: string,
+  data: string
 }
 ```
+
 </td>
 <td><strong>201</strong>
 </td>
@@ -49,33 +49,35 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
   <td><strong>Get Requests</strong></td>
   <td>
 
-```json
+```typescript
 {
-  "method": "getRequests",
-  "sessionId": "string"
+  method: "getRequests",
+  sessionId: string
 }
 ```
+
 </td>
 <td><strong>200</strong></td>
 <td>
 
-
-```json
-["string", "string"]
+```typescript
+string[]
 ```
+
 </td>
 </tr>
 <tr>
   <td><strong>Send Response</strong></td>
   <td>
 
-```json
+```typescript
 {
-  "method": "sendResponse",
-  "sessionId": "string",
-  "data": "string"
+  method: "sendResponse",
+  sessionId: string,
+  data: string
 }
 ```
+
 </td>
 <td><strong>201</strong></td>
 <td><i>empty</i></td>
@@ -84,24 +86,106 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
   <td><strong>Get Responses</strong></td>
   <td>
 
-```json
+```typescript
 {
-  "method": "getResponses",
-  "sessionId": "string"
+  method: "getResponses",
+  sessionId: string
 }
 ```
+
 </td>
 <td><strong>200</strong></td>
 <td>
 
-```json
-["string", "string"]
+```typescript
+string[]
 ```
+
+</td>
+</tr>
+<tr>
+  <td><strong>Send Handshake Request</strong></td>
+  <td>
+
+```typescript
+{
+  method: "sendHandshakeRequest",
+  sessionId: string,
+  publicKey: string
+}
+```
+
+</td>
+<td><strong>201</strong>
+</td>
+<td><i>empty</i></td>
+</tr>
+<tr>
+  <td><strong>Get Handshake Request</strong></td>
+  <td>
+
+```typescript
+{
+  method: "getHandshakeRequest",
+  sessionId: string,
+  publicKey: string
+}
+```
+
+</td>
+<td><strong>200</strong>
+</td>
+<td>
+
+```typescript
+{ publicKey?: string  }
+```
+
+</td>
+</tr>
+<tr>
+  <td><strong>Send Handshake Response</strong></td>
+  <td>
+
+```typescript
+{
+  method: "sendHandshakeResponse",
+  sessionId: string,
+  publicKey: string
+}
+```
+
+</td>
+<td><strong>201</strong>
+</td>
+<td><i>empty</i></td>
+</tr>
+<tr>
+  <td><strong>Get Handshake Response</strong></td>
+  <td>
+
+```typescript
+{
+  method: "getHandshakeResponse",
+  sessionId: string,
+  publicKey: string
+}
+```
+
+</td>
+<td><strong>200</strong>
+</td>
+<td>
+
+```typescript
+{ publicKey?: string  }
+```
+
 </td>
 </table>
 
-
 ### Error responses
+
 <table>
 <tr>
 <td><strong>HTTP Code</strog></td>
@@ -115,10 +199,12 @@ Once data is retrieved for a specific `sessionId` using the `getRequests` or `ge
 ```json
 { "error": "Invalid request" }
 ```
+
 </td>
 <td>
 
 When request body is invalid or does not pass `zod` validation
+
 </td>
 </tr>
 <tr>
@@ -128,10 +214,12 @@ When request body is invalid or does not pass `zod` validation
 ```json
 { "error": "Not Found" }
 ```
+
 </td>
 <td>
 
 When anything other than `POST /api/v1` or `GET /` is requested
+
 </td>
 </tr>
 
@@ -152,7 +240,7 @@ Used for health check and collecting metrics
   <strong>Health `GET /`</strong></td>
 <td>
 
-```OK```
+`OK`
 
 </td>
 </tr>
@@ -162,14 +250,14 @@ Used for health check and collecting metrics
   <strong>Metrics `GET /metrics`</strong></td>
 <td>
 
-*Prometheus metrics*
+_Prometheus metrics_
 
 </td>
 </tr>
 </table>
 
-
 ### Error responses
+
 <table>
 <tr>
 <td><strong>HTTP Code</strog></td>
@@ -183,10 +271,12 @@ Used for health check and collecting metrics
 ```json
 { "error": "Not Found" }
 ```
+
 </td>
 <td>
 
 When anything other than `GET /` or `GET /metrics` is requested
+
 </td>
 </tr>
 
