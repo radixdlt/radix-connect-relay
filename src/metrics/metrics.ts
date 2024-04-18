@@ -70,5 +70,4 @@ export const responseSizeHistogram = new client.Histogram({
   buckets: client.linearBuckets(20000, 20000, 50),
 });
 
-// TODO: Uncomment when `prom-client` is not throwing errors
-// client.collectDefaultMetrics();
+client.collectDefaultMetrics();
