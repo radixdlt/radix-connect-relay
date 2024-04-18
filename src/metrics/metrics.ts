@@ -1,42 +1,42 @@
 import client from "prom-client";
 
 export const addRequestCounter = new client.Counter({
-  name: "radix_connect_relay_add_request_counter",
+  name: "radix_connect_relay_add_request_count",
   help: "The number of added requests",
 });
 
 export const addResponseCounter = new client.Counter({
-  name: "radix_connect_relay_add_response_counter",
+  name: "radix_connect_relay_add_response_count",
   help: "The number of added responses",
 });
 
 export const getResponsesCounter = new client.Counter({
-  name: "radix_connect_relay_get_responses_counter",
+  name: "radix_connect_relay_get_responses_count",
   help: "The number of requests to get relay responses",
 });
 
 export const getRequestsCounter = new client.Counter({
-  name: "radix_connect_relay_get_requests_counter",
+  name: "radix_connect_relay_get_requests_count",
   help: "The number of requests to get relay requests",
 });
 
 export const addHandshakeRequestCounter = new client.Counter({
-  name: "radix_connect_relay_add_handshake_request_counter",
+  name: "radix_connect_relay_add_handshake_request_count",
   help: "The number of added handshake requests",
 });
 
 export const getHandshakeRequestCounter = new client.Counter({
-  name: "radix_connect_relay_get_handshake_request_counter",
+  name: "radix_connect_relay_get_handshake_request_count",
   help: "The number of requests to get relay request",
 });
 
 export const addHandshakeResponseCounter = new client.Counter({
-  name: "radix_connect_relay_add_handshake_response_counter",
+  name: "radix_connect_relay_add_handshake_response_count",
   help: "The number of added handshake responses",
 });
 
 export const getHandshakeResponseCounter = new client.Counter({
-  name: "radix_connect_relay_get_handshake_response_counter",
+  name: "radix_connect_relay_get_handshake_response_count",
   help: "The number of responses to get relay response",
 });
 
