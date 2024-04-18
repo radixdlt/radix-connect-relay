@@ -128,7 +128,6 @@ string[]
 {
   method: "getHandshakeRequest",
   sessionId: string,
-  publicKey: string
 }
 ```
 
@@ -168,7 +167,6 @@ string[]
 {
   method: "getHandshakeResponse",
   sessionId: string,
-  publicKey: string
 }
 ```
 
