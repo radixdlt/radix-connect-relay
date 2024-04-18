@@ -33,10 +33,10 @@ export const Controller = ({ model }: { model: Model }) => {
   };
 
   const addHandshakeRequest = async ({
-    publicKey,
+    data,
     sessionId,
   }: SendHandshakeRequestBody) => {
-    await model.set(`${sessionId}:handshake:request`, publicKey);
+    await model.set(`${sessionId}:handshake:request`, data);
     return { status: 201 };
   };
 
@@ -48,10 +48,10 @@ export const Controller = ({ model }: { model: Model }) => {
   };
 
   const addHandshakeResponse = async ({
-    publicKey,
+    data,
     sessionId,
   }: SendHandshakeResponseBody) => {
-    await model.set(`${sessionId}:handshake:response`, publicKey);
+    await model.set(`${sessionId}:handshake:response`, data);
     return { status: 201 };
   };
 
