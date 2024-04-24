@@ -9,7 +9,7 @@ export const Server = async ({
   port,
 }: {
   port: string;
-  redis: { url: string; password: string };
+  redis: { url: string; password: string, clusterMode: string, };
 }) => {
   Bun.serve({
     port,
