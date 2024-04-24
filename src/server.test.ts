@@ -18,10 +18,10 @@ const inMemoryRedis = await RedisServer();
 
 await Server({
   port: "3001",
-  redis: { url: inMemoryRedis.url, password: "" },
+  redis: { url: inMemoryRedis.url, password: "", isClusterMode: "no" },
 });
 
-const redis = await Redis({ url: inMemoryRedis.url, password: "" });
+const redis = await Redis({ url: inMemoryRedis.url, password: "", isClusterMode: "no" });
 
 const model = Model({ redis });
 
