@@ -2,7 +2,7 @@ import type { Controller } from "../controller";
 import { logger } from "../logger";
 import { invalidRequest } from "./helpers/invalidRequest";
 import { notFoundResponse } from "./helpers/notFoundResponse";
-import { routeHandler } from "./helpers/routeHandler";
+import { RouteHandler } from "./helpers/routeHandler";
 import { ApiV1Requests } from "../schemas";
 import { getRequestBody } from "./helpers/getJson";
 import {
@@ -44,8 +44,10 @@ export const Router =
     logger.debug({
       path: url.pathname,
       httpMethod: req.method,
-      data,
+      requestBody: data,
     });
+
+    const routeHandler = RouteHandler(logger.child({ method: data.method }));
 
     switch (data.method) {
       case "sendRequest":
