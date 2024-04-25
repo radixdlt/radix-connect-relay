@@ -39,12 +39,13 @@ export const Router =
     );
     if (!parsedRequestBody.success) return invalidRequest;
 
+    const { data, ...rest } = parsedRequestBody;
+
     logger.debug({
       path: url.pathname,
-      method: req.method,
+      httpMethod: req.method,
+      ...rest,
     });
-
-    const data = parsedRequestBody.data;
 
     switch (data.method) {
       case "sendRequest":
