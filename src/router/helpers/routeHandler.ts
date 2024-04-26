@@ -6,7 +6,7 @@ export const RouteHandler =
   ({ data, status }: { data?: any; status: number }) => {
     const stringifiedData = data !== undefined ? JSON.stringify(data) : data;
     responseSizeHistogram.observe(stringifiedData?.length || 0);
-    logger.debug({ event: "success", status, data });
+    logger.debug({ status, response: data });
     return new Response(stringifiedData, {
       status: status,
       headers: {

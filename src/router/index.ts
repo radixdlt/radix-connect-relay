@@ -47,7 +47,9 @@ export const Router =
       requestBody: data,
     });
 
-    const routeHandler = RouteHandler(logger.child({ method: data.method }));
+    const routeHandler = RouteHandler(
+      logger.child({ method: data.method, path: url.pathname })
+    );
 
     switch (data.method) {
       case "sendRequest":
