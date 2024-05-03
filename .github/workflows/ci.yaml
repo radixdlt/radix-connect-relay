@@ -89,7 +89,7 @@ jobs:
   deploy-pull-request:
     if: ${{ github.event.pull_request }}
     name: "Deploy PR"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - setup-tags
       - push-docker-image
@@ -113,7 +113,7 @@ jobs:
   deploy-dev:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     name: "Deploy DEV"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - setup-tags
       - push-docker-image
@@ -137,7 +137,7 @@ jobs:
   deploy-prod:
     if: github.event_name == 'release' && github.event.action == 'released'
     name: "Deploy PROD"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@v0.15.0
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
     needs:
       - setup-tags
       - push-docker-image
