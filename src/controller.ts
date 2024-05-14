@@ -53,11 +53,7 @@ export const Controller = ({ model }: { model: Model }) => {
     data,
     sessionId,
   }: SendHandshakeResponseBody) => {
-    await model.setItem(
-      `${sessionId}:handshake:response`,
-      "HANDSHAKE_RESPONSE",
-      data
-    );
+    await model.setItem(sessionId, "HANDSHAKE_RESPONSE", data);
     return { status: 201 };
   };
 
@@ -65,7 +61,7 @@ export const Controller = ({ model }: { model: Model }) => {
     sessionId,
   }: GetHandshakeResponseBody) => {
     const publicKey = await model
-      .getItems(`${sessionId}:handshake:response`, "HANDSHAKE_RESPONSE")
+      .getItems(sessionId, "HANDSHAKE_RESPONSE")
       .then((items) => items[0]);
     return { data: { publicKey }, status: 200 };
   };
