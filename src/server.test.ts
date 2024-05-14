@@ -1,8 +1,6 @@
 import { describe, expect, it, jest, beforeEach } from "bun:test";
 import { Model } from "./model";
-import { RedisServer } from "./test-helpers/inMemoryRedisServer";
 import { Server } from "./server";
-import { Redis } from "./redis";
 import { Controller } from "./controller";
 import { Router } from "./router";
 import type {
@@ -14,16 +12,11 @@ import type {
 
 const apiBaseUrl = `http://localhost:3001`;
 
-const inMemoryRedis = await RedisServer();
-
 await Server({
   port: "3001",
-  redis: { url: inMemoryRedis.url, password: "", clusterMode: "disabled" },
 });
 
-const redis = await Redis({ url: inMemoryRedis.url, password: "", clusterMode: "disabled" });
-
-const model = Model({ redis });
+const model = Model();
 
 const controller = Controller({ model });
 
@@ -189,13 +182,13 @@ describe("API", () => {
           data: await res.json(),
           status: res.status,
         }));
+
         expect(response).toEqual({ status: 201, data: null });
-        expect(await model.getItems(`${request.sessionId}:requests`)).toEqual([
+
+        expect(await model.getItems(request.sessionId, "REQUEST")).toEqual([
           request.data,
         ]);
-        expect(await model.getItems(`${request.sessionId}:requests`)).toEqual(
-          []
-        );
+        expect(await model.getItems(request.sessionId, "REQUEST")).toEqual([]);
       });
       it("should return requests", async () => {
         const sessionId = generateSessionId();
@@ -244,12 +237,10 @@ describe("API", () => {
           status: res.status,
         }));
         expect(response).toEqual({ status: 201, data: null });
-        expect(await model.getItems(`${request.sessionId}:responses`)).toEqual([
+        expect(await model.getItems(request.sessionId, "RESPONSE")).toEqual([
           request.data,
         ]);
-        expect(await model.getItems(`${request.sessionId}:responses`)).toEqual(
-          []
-        );
+        expect(await model.getItems(request.sessionId, "RESPONSE")).toEqual([]);
       });
     });
 
@@ -325,6 +316,7 @@ describe("API", () => {
           await controller.getHandshakeRequest(getHandshakeRequestBody)
         ).toEqual({
           status: 200,
+          // @ts-ignore
           data: { publicKey: undefined },
         });
 
@@ -344,6 +336,7 @@ describe("API", () => {
           await controller.getHandshakeResponse(getHandshakeResponseBody)
         ).toEqual({
           status: 200,
+          // @ts-ignore
           data: { publicKey: undefined },
         });
       });

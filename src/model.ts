@@ -1,51 +1,43 @@
-import config from "./config";
 import {
   redisDeleteTime,
   redisGetKeyTime,
   redisSetTime,
 } from "./metrics/metrics";
-import type { Redis } from "./redis";
+import { PrismaClient, RequestType } from "./prisma";
 
 export type Model = ReturnType<typeof Model>;
-export const Model = ({ redis }: { redis: Redis }) => {
-  const setItem = async (key: string, value: string) => {
+export const Model = (dbClient = new PrismaClient()) => {
+  const setItem = async (
+    sessionId: string,
+    type: RequestType,
+    data: string
+  ) => {
     const t0 = performance.now();
-    await Promise.all([
-      redis.sAdd(key, value),
-      redis.expire(key, config.redis.TTL),
-    ]);
+    await dbClient.request.create({ data: { sessionId, data, type } });
     const t1 = performance.now();
     redisSetTime.observe(t1 - t0);
   };
 
-  const getItems = async (key: string) => {
+  const getItems = async (sessionId: string, type: RequestType) => {
     const t0 = performance.now();
-    const value = await redis.sMembers(key);
+
+    const items = await dbClient.request
+      .findMany({
+        where: { sessionId, type },
+        select: { data: true },
+      })
+      .then((items) => items.map((item) => item.data));
+
     const t1 = performance.now();
     redisGetKeyTime.observe(t1 - t0);
-    if (value.length) {
+    if (items.length) {
       const t0 = performance.now();
-      await redis.del(key);
+      await dbClient.request.deleteMany({ where: { sessionId, type } });
       const t1 = performance.now();
       redisDeleteTime.observe(t1 - t0);
     }
-    return value;
+    return items;
   };
 
-  const set = async (key: string, value: string) => {
-    const t0 = performance.now();
-    await redis.set(key, value, { EX: config.redis.TTL });
-    const t1 = performance.now();
-    redisSetTime.observe(t1 - t0);
-  };
-
-  const get = async (key: string) => {
-    const t0 = performance.now();
-    const value = await redis.getDel(key);
-    const t1 = performance.now();
-    redisGetKeyTime.observe(t1 - t0);
-    return value ? value : undefined;
-  };
-
-  return { setItem, getItems, set, get };
+  return { setItem, getItems };
 };
