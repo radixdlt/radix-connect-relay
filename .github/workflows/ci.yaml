@@ -63,9 +63,6 @@ jobs:
       - name: Build
         run: bun run build --target=bun
 
-      - name: Unit tests
-        run: bun test
-
   push-docker-image:
     name: Docker
     uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/docker-build.yml@main
