@@ -41,6 +41,21 @@ releases:
           extraFlags: 
           - "--maxmemory-policy noeviction"
 
+  - name: postgres
+    chart: bitnami/postgresql
+    installed: {{ eq .Environment.Name "pr" }}
+    version: 15.3.2
+    values:
+      - auth:
+          postgresPassword: postgres
+          database: radix_connect_relay
+        storageClass: gp3-no-retain
+        primary:
+          persistence:
+            enabled: true
+        image:
+          tag: 15.7.0-debian-12-r3
+
   - name: developer-access
     chart: rdx-works/developer-access
     version: 1.0.0
