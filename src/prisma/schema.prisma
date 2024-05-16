@@ -22,8 +22,8 @@ model Request {
   data             String   
   createdAt        DateTime @default(now())
 
-  @@index([sessionId, createdAt(sort: Desc)])
   @@index(createdAt(sort: Desc))
+  @@index(sessionId)
 }
 
 enum RequestType {

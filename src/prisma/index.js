@@ -169,8 +169,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  binaryTargets = [\"native\", \"linux-arm64-openssl-1.1.x\", \"debian-openssl-1.1.x\"]\n  output   = \"../src/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Request {\n  id               Int       @id @default(autoincrement())\n  sessionId        String   \n  type             RequestType\n  data             String   \n  createdAt        DateTime @default(now())\n\n  @@index([sessionId, createdAt(sort: Desc)])\n}\n\nenum RequestType {\n  REQUEST\n  RESPONSE\n  HANDSHAKE_REQUEST\n  HANDSHAKE_RESPONSE\n}",
-  "inlineSchemaHash": "e6956119f337f9bd510103459b005edaeb34e87a841c7592db82862bd5cd6b64",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  binaryTargets = [\"native\", \"linux-arm64-openssl-1.1.x\", \"debian-openssl-1.1.x\"]\n  output   = \"../src/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Request {\n  id               Int       @id @default(autoincrement())\n  sessionId        String   \n  type             RequestType\n  data             String   \n  createdAt        DateTime @default(now())\n\n  @@index(createdAt(sort: Desc))\n  @@index(sessionId)\n}\n\nenum RequestType {\n  REQUEST\n  RESPONSE\n  HANDSHAKE_REQUEST\n  HANDSHAKE_RESPONSE\n}",
+  "inlineSchemaHash": "1ba52dc4a5c829cff8ccdc9b0a71d41396bdf228bc7361d5ca67522c37344f02",
   "copyEngine": true
 }
 
