@@ -14,3 +14,5 @@ CREATE TABLE "Request" (
 
 -- CreateIndex
 CREATE INDEX "Request_sessionId_createdAt_idx" ON "Request"("sessionId", "createdAt" DESC);
+
+CREATE INDEX "Request_createdAt_idx" ON "Request"("createdAt" DESC);
