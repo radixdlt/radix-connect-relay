@@ -28,6 +28,6 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
-                psql $DATABASE_URL -c "DELETE FROM Request WHERE createdAt < NOW() - INTERVAL '5 minutes';"
+                psql $DATABASE_URL -c "DELETE FROM \"Request\" WHERE \"createdAt\" < NOW() - INTERVAL '5 minutes';"
           restartPolicy: OnFailure
 

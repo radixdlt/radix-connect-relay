@@ -38,7 +38,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c", "-e"]
           args:
-            - bun run prisma migrate deploy --schema prisma/schema.prisma
+            - bun run prisma migrate deploy
           env:
           {{- range $key, $value := .Values.params }}
           - name: {{ $key }}
