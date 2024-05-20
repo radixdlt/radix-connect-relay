@@ -2,20 +2,20 @@ import { Controller } from "./controller";
 import { logger } from "./logger";
 import { Model } from "./model";
 import { Router } from "./router";
-import { PrismaClient } from "./prisma";
+import { prisma, type PrismaClientWithReadReplica } from "./db";
 
 export const Server = async ({
   port,
   dbClient,
 }: {
   port: string;
-  dbClient?: PrismaClient;
+  dbClient?: PrismaClientWithReadReplica;
 }) => {
   Bun.serve({
     port,
     fetch: Router({
       controller: Controller({
-        model: Model(dbClient),
+        model: Model(dbClient ?? prisma),
       }),
     }),
   });

@@ -9,4 +9,7 @@ export default {
     password: process.env.REDIS_PASSWORD!,
     TTL: FIVE_MINUTES_IN_SECONDS,
   },
+  db: {
+    readReplicaUrls: process.env.DATABASE_URL!.split(","),
+  },
 };

@@ -1,12 +1,13 @@
+import { prisma } from "./db";
 import {
   redisDeleteTime,
   redisGetKeyTime,
   redisSetTime,
 } from "./metrics/metrics";
-import { PrismaClient, RequestType } from "./prisma";
+import { RequestType } from "./prisma";
 
 export type Model = ReturnType<typeof Model>;
-export const Model = (dbClient = new PrismaClient()) => {
+export const Model = (dbClient = prisma) => {
   const setItem = async (
     sessionId: string,
     type: RequestType,
