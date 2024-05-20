@@ -27,20 +27,6 @@ releases:
     values:
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
 
-  - name: redis
-    chart: bitnami/redis
-    version:  18.19.4
-    installed: {{ eq .Environment.Name "pr" }}
-    values:
-      - architecture: standalone
-        auth:
-          enabled: false
-        master:
-          persistence:
-            enabled: false
-          extraFlags: 
-          - "--maxmemory-policy noeviction"
-
   - name: postgres
     chart: bitnami/postgresql
     installed: {{ eq .Environment.Name "pr" }}
