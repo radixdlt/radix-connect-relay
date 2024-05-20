@@ -2,12 +2,9 @@ image:
     tag: {{ .StateValues.ci.tag }}
 
 params:
-  REDIS_HOST: redis-master
-  REDIS_PORT: 6379
-  REDIS_PASSWORD: 
-  REDIS_CLUSTER_MODE: disabled
   PORT: 3000
   INTERNAL_PORT: 3001
+  DATABASE_URL: postgresql://postgres:postgres@postgres-postgresql:5432/radix_connect_relay
 
 ingress:
   enabled: true

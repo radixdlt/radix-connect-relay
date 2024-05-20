@@ -2,12 +2,15 @@ image:
     tag: {{ .StateValues.ci.tag }}
 
 params:
-  REDIS_HOST: radix-connect-relay-prod-redis.rtlj-prod.internal
-  REDIS_PORT: 6379
-  REDIS_PASSWORD: 
-  REDIS_CLUSTER_MODE: disabled
   PORT: 3000
   INTERNAL_PORT: 3001
+
+secrets:
+  - external_secret_name: postgres
+    env_variable: "DATABASE_URL"
+    aws_secret_name: "rtlj-prod/eks/radix-connect-relay/prod/postgres"
+    aws_secret_key: "database-url"
+    secret_key: "database-url"
 
 ingress:
   enabled: true

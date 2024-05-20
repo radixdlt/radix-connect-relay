@@ -33,6 +33,9 @@ COPY --from=prerelease /usr/src/app/src/ .
 COPY --from=prerelease /usr/src/app/package.json .
 COPY --from=prerelease /usr/src/app/prisma/ .
 
+# This will download the prisma engines.
+RUN bun run prisma migrate --help
+
 # run the app
 USER bun
 EXPOSE 3000/tcp

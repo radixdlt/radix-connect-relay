@@ -27,19 +27,20 @@ releases:
     values:
       - environments/{{ .Environment.Name }}/values.yaml.gotmpl
 
-  - name: redis
-    chart: bitnami/redis
-    version:  18.19.4
+  - name: postgres
+    chart: bitnami/postgresql
     installed: {{ eq .Environment.Name "pr" }}
+    version: 15.3.2
     values:
-      - architecture: standalone
-        auth:
-          enabled: false
-        master:
+      - auth:
+          postgresPassword: postgres
+          database: radix_connect_relay
+        storageClass: gp3-no-retain
+        primary:
           persistence:
-            enabled: false
-          extraFlags: 
-          - "--maxmemory-policy noeviction"
+            enabled: true
+        image:
+          tag: 15.7.0-debian-12-r3
 
   - name: developer-access
     chart: rdx-works/developer-access
