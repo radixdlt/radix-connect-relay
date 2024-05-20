@@ -1,4 +1,4 @@
-image: 
+image:
     tag: {{ .StateValues.ci.tag }}
 
 params:
@@ -11,6 +11,11 @@ secrets:
     aws_secret_name: "rdx-works-main-dev/eks/radix-connect-relay/dev/postgres"
     aws_secret_key: "database-url"
     secret_key: "database-url"
+  - external_secret_name: postgres-read
+    env_variable: "READ_REPLICA_URLS"
+    aws_secret_name: "rdx-works-main-dev/eks/radix-connect-relay/dev/postgres"
+    aws_secret_key: "read-replica-urls"
+    secret_key: "read-replica-urls"
 
 ingress:
   enabled: true

@@ -5,6 +5,7 @@ params:
   PORT: 3000
   INTERNAL_PORT: 3001
   DATABASE_URL: postgresql://postgres:postgres@postgres-postgresql:5432/radix_connect_relay
+  READ_REPLICA_URLS: postgresql://postgres:postgres@postgres-postgresql:5432/radix_connect_relay
 
 ingress:
   enabled: true

@@ -11,6 +11,12 @@ secrets:
     aws_secret_name: "rtlj-prod/eks/radix-connect-relay/prod/postgres"
     aws_secret_key: "database-url"
     secret_key: "database-url"
+  - external_secret_name: postgres-read
+    env_variable: "READ_REPLICA_URLS"
+    aws_secret_name: "rtlj-prod/eks/radix-connect-relay/prod/postgres"
+    aws_secret_key: "read-replica-urls"
+    secret_key: "read-replica-urls"
+
 
 ingress:
   enabled: true
