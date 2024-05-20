@@ -10,6 +10,7 @@ export default {
     TTL: FIVE_MINUTES_IN_SECONDS,
   },
   db: {
-    readReplicaUrls: process.env.DATABASE_URL!.split(","),
+    url: process.env.DATABASE_URL!,
+    readReplicaUrls: (process.env.READ_REPLICA_URLS ?? "").split(","),
   },
 };
