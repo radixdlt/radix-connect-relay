@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "radix-connect-relay.labels" . | nindent 4 }}
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "0 * * * *" # Run every hour
   jobTemplate:
     spec:
       template:
