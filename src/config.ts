@@ -1,5 +1,3 @@
-const FIVE_MINUTES_IN_SECONDS = 300;
-
 export default {
   internalPort: process.env.INTERNAL_PORT!,
   port: process.env.PORT!,
@@ -7,7 +5,7 @@ export default {
     url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
     clusterMode: process.env.REDIS_CLUSTER_MODE,
     password: process.env.REDIS_PASSWORD!,
-    TTL: FIVE_MINUTES_IN_SECONDS,
+    TTL: process.env.REDIS_TTL,
   },
   db: {
     url: process.env.DATABASE_URL!,
