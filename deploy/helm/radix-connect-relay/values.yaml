@@ -35,7 +35,7 @@ ingress:
   enabled: false
   className: "nginx"
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 1m
+    nginx.ingress.kubernetes.io/proxy-body-size: 100K
   hosts: []
   tls: []
 
