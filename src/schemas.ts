@@ -13,12 +13,26 @@ export const GetRequestsBody = z.object({
   sessionId: z.string(),
 });
 
-export type SendResponseBody = z.infer<typeof SendResponseBody>;
-export const SendResponseBody = z.object({
+export type SendSuccessResponseBody = z.infer<typeof SendSuccessResponseBody>;
+export const SendSuccessResponseBody = z.object({
   method: z.literal("sendResponse"),
   sessionId: z.string(),
+  publicKey: z.string(),
   data: z.string(),
 });
+
+export type SendErrorResponseBody = z.infer<typeof SendErrorResponseBody>;
+export const SendErrorResponseBody = z.object({
+  method: z.literal("sendResponse"),
+  sessionId: z.string(),
+  error: z.string(),
+});
+
+export type SendResponseBody = z.infer<typeof SendResponseBody>;
+export const SendResponseBody = z.union([
+  SendSuccessResponseBody,
+  SendErrorResponseBody,
+]);
 
 export type GetResponsesBody = z.infer<typeof GetResponsesBody>;
 export const GetResponsesBody = z.object({
@@ -57,7 +71,7 @@ export const GetHandshakeResponseBody = z.object({
 });
 
 export type ApiV1Requests = z.infer<typeof ApiV1Requests>;
-export const ApiV1Requests = z.discriminatedUnion("method", [
+export const ApiV1Requests = z.union([
   SendRequestBody,
   GetRequestsBody,
   SendResponseBody,

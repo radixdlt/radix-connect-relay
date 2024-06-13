@@ -32,14 +32,7 @@ releases:
     version:  18.19.4
     installed: {{ eq .Environment.Name "pr" }}
     values:
-      - architecture: standalone
-        auth:
-          enabled: false
-        master:
-          persistence:
-            enabled: false
-          extraFlags: 
-          - "--maxmemory-policy noeviction"
+      - environments/{{ .Environment.Name }}/redis.yaml.gotmpl
 
   - name: developer-access
     chart: rdx-works/developer-access
