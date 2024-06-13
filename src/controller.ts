@@ -1,5 +1,5 @@
 import { Model } from "./model";
-import type {
+import {
   GetHandshakeRequestBody,
   GetHandshakeResponseBody,
   GetRequestsBody,
@@ -12,7 +12,9 @@ import type {
 
 export type Controller = ReturnType<typeof Controller>;
 export const Controller = ({ model }: { model: Model }) => {
-  const addRequest = async ({ data, sessionId }: SendRequestBody) => {
+  const addRequest = async (body: SendRequestBody) => {
+    const { sessionId, data } = body;
+
     await model.setItem(`${sessionId}:requests`, data);
     return { status: 201 };
   };
@@ -22,14 +24,19 @@ export const Controller = ({ model }: { model: Model }) => {
     return { data, status: 200 };
   };
 
-  const addResponse = async ({ data, sessionId }: SendResponseBody) => {
-    await model.setItem(`${sessionId}:responses`, data);
+  const addResponse = async (body: SendResponseBody) => {
+    const { sessionId, data, publicKey, error } = body as any;
+
+    await model.setItem(
+      `${sessionId}:responses`,
+      JSON.stringify({ sessionId, data, publicKey, error })
+    );
     return { status: 201 };
   };
 
   const getResponses = async ({ sessionId }: GetResponsesBody) => {
     const data = await model.getItems(`${sessionId}:responses`);
-    return { data, status: 200 };
+    return { data: data.map((d) => JSON.parse(d)), status: 200 };
   };
 
   const addHandshakeRequest = async ({
