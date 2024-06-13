@@ -21,7 +21,11 @@ await Server({
   redis: { url: inMemoryRedis.url, password: "", clusterMode: "disabled" },
 });
 
-const redis = await Redis({ url: inMemoryRedis.url, password: "", clusterMode: "disabled" });
+const redis = await Redis({
+  url: inMemoryRedis.url,
+  password: "",
+  clusterMode: "disabled",
+});
 
 const model = Model({ redis });
 
@@ -137,6 +141,7 @@ describe("API", () => {
               method: "sendResponse",
               sessionId: generateSessionId(),
               data: "",
+              publicKey: "",
             }),
           })
         );
@@ -231,59 +236,55 @@ describe("API", () => {
     });
 
     describe("sendResponse", () => {
-      it("should set response", async () => {
+      it("should get invalid request response", async () => {
         const request = {
           method: "sendResponse",
           ...createItem(),
         };
-        const response = await fetch(`${url}`, {
+        const { json, status } = await fetch(`${url}`, {
           method: "POST",
           body: JSON.stringify(request),
         }).then(async (res) => ({
-          data: await res.json(),
+          json: await res.json(),
           status: res.status,
         }));
-        expect(response).toEqual({ status: 201, data: null });
-        expect(await model.getItems(`${request.sessionId}:responses`)).toEqual([
-          request.data,
-        ]);
-        expect(await model.getItems(`${request.sessionId}:responses`)).toEqual(
-          []
-        );
+        expect(status).toEqual(400);
+        expect(json).toEqual({ error: "Invalid request" });
       });
-    });
+      it("should send response", async () => {
+        const request = {
+          method: "sendResponse",
+          sessionId: generateSessionId(),
+          publicKey: generateRandomValue(32),
+          data: generateRandomValue(4),
+        };
+        const sendResponseResult = await fetch(`${url}`, {
+          method: "POST",
+          body: JSON.stringify(request),
+        }).then(async (res) => ({
+          json: await res.json(),
+          status: res.status,
+        }));
+        expect(sendResponseResult.status).toEqual(201);
 
-    describe("getResponses", () => {
-      it("should get reponses", async () => {
-        const sessionId = generateSessionId();
-        const randomData1 = generateRandomValue(4);
-        const randomData2 = generateRandomValue(4);
-
-        await fetch(`${url}`, {
+        const getResponsesResult = await fetch(`${url}`, {
           method: "POST",
           body: JSON.stringify({
-            method: "sendResponse",
-            ...createItem(sessionId, randomData1),
+            method: "getResponses",
+            sessionId: request.sessionId,
           }),
-        });
-        await fetch(`${url}`, {
-          method: "POST",
-          body: JSON.stringify({
-            method: "sendResponse",
-            ...createItem(sessionId, randomData2),
-          }),
-        });
-        const response = await fetch(`${url}`, {
-          method: "POST",
-          body: JSON.stringify({ method: "getResponses", sessionId }),
         }).then(async (res) => ({
           data: await res.json(),
           status: res.status,
         }));
-        expect(response).toEqual({
-          data: [randomData1, randomData2],
-          status: 200,
-        });
+
+        expect(getResponsesResult.data).toEqual([
+          {
+            data: request.data,
+            publicKey: request.publicKey,
+            sessionId: request.sessionId,
+          },
+        ]);
       });
     });
 

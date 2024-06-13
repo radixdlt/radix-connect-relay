@@ -5,6 +5,6 @@ export default {
     url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
     clusterMode: process.env.REDIS_CLUSTER_MODE,
     password: process.env.REDIS_PASSWORD!,
-    TTL: process.env.REDIS_TTL ?? 30,
+    TTL: parseInt(process.env.REDIS_TTL || "30"),
   },
 };
