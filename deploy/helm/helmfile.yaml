@@ -32,7 +32,7 @@ releases:
     version:  18.19.4
     installed: {{ eq .Environment.Name "pr" }}
     values:
-      - environments/{{ .Environment.Name }}/redis.yaml.gotmpl
+      - environments/{{ .Environment.Name }}/redis.yaml
 
   - name: developer-access
     chart: rdx-works/developer-access
