@@ -59,6 +59,6 @@ metrics:
         labels:
           severity: error
         annotations:
-          summary: Redis instance {{ "{{ $labels.instance }}" }} has evicted keys
+          summary: 'Redis instance {{ "{{ $labels.instance }}" }} has evicted keys'
           description: |
-            Redis instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
+            'Redis instance has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.'
