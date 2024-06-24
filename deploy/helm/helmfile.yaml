@@ -38,10 +38,10 @@ releases:
 
   - name: redis-exporter
     chart: kubesphere/redis-exporter
-    version:  18.19.4
+    version:  3.4.6
     installed: {{ ne .Environment.Name "pr" }}
     values:
-      - environments/{{ .Environment.Name }}/redis.yaml
+      - environments/{{ .Environment.Name }}/redis-exporter.yaml
 
   - name: developer-access
     chart: rdx-works/developer-access
