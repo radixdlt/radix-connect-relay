@@ -21,6 +21,8 @@ repositories:
     url: https://raw.githubusercontent.com/radixdlt/helm-charts/master/
     username: {{ requiredEnv "HELM_GH_USER" }}
     password: {{ requiredEnv "HELM_GH_PASS" }}
+  - name: kubesphere 
+    url: https://charts.kubesphere.io/main
 releases:
   - name: radix-connect-relay
     chart: ./radix-connect-relay/
@@ -31,6 +33,13 @@ releases:
     chart: bitnami/redis
     version:  18.19.4
     installed: {{ eq .Environment.Name "pr" }}
+    values:
+      - environments/{{ .Environment.Name }}/redis.yaml
+
+  - name: redis-exporter
+    chart: kubesphere/redis-exporter
+    version:  18.19.4
+    installed: {{ ne .Environment.Name "pr" }}
     values:
       - environments/{{ .Environment.Name }}/redis.yaml
 

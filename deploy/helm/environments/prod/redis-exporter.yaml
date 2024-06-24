@@ -1,0 +1,3 @@
+redisAddress: radix-connect-relay-prod-redis.rtlj-prod.internal
+rbac:
+  pspEnabled: false
