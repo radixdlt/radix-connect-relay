@@ -74,3 +74,8 @@ secrets: []
 metrics:
   enabled: true
   port: 3001
+
+alerts:
+  cluster: update_me
+  env: update_me
+  dashboard_url: "https://radixdlt.grafana.net/d/radix-connect-relay/radix-connect-relay?orgId=1&refresh=30s"
