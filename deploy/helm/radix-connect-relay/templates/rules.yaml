@@ -1,0 +1,97 @@
+{{- $cluster := .Values.alerts.cluster -}}
+{{- $env := .Values.alerts.env -}}
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    {{- include "radix-connect-relay.labels" . | nindent 4 }}
+  name: {{ include "radix-connect-relay.fullname" . }}
+spec:
+  groups:
+  - name: RadixConnectRelay
+    rules:
+    - alert: HighRedisGetResponseTimes
+      expr: histogram_quantile(0.95, sum(rate(radix_connect_relay_redis_get_time_bucket{namespace={{ .Release.Namespace | quote }}}[1m])) by (le)) > 500
+      labels:
+        severity: critical
+        cluster: {{ $cluster }}
+        env: {{ $env }}
+        tier: application
+        application: radix-connect-relay
+        namespace: {{ .Release.Namespace }}
+      for: 5m
+      annotations:
+        summary: "High response GET time on Redis"
+        description: "The p95 response GET times on Redis are over 500ms"
+        dashboard: {{ .Values.alerts.dashboard_url }}
+        namespace: {{ .Release.Namespace }}
+        runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
+
+    - alert: HighRedisSetResponseTimes
+      expr: histogram_quantile(0.95, sum(rate(radix_connect_relay_redis_set_time_bucket{namespace={{ .Release.Namespace | quote }}}[1m])) by (le)) > 500
+      labels:
+        severity: critical
+        cluster: {{ $cluster }}
+        env: {{ $env }}
+        tier: application
+        application: radix-connect-relay
+        namespace: {{ .Release.Namespace }}
+      for: 5m
+      annotations:
+        summary: "High response SET time on Redis"
+        description: "The p95 response SET times on Redis are over 500ms"
+        dashboard: {{ .Values.alerts.dashboard_url }}
+        namespace: {{ .Release.Namespace }}
+        runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
+
+    - alert: HighNumberOfRedisKeys
+      expr: sum (redis_db_keys_expiring{namespace=~{{ .Release.Namespace | quote }}}) by (namespace) > 10000
+      labels:
+        severity: critical
+        cluster: {{ $cluster }}
+        env: {{ $env }}
+        tier: application
+        application: radix-connect-relay
+        namespace: {{ .Release.Namespace }}
+      for: 5m
+      annotations:
+        summary: "High number of Redis keys"
+        description: "The keys currently on Redis are over 10k"
+        dashboard: {{ .Values.alerts.dashboard_url }}
+        namespace: {{ .Release.Namespace }}
+        runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
+
+    - alert: HighMemoryUsageOnRedis
+      expr: redis_memory_used_bytes{namespace={{ .Release.Namespace | quote }}} / 1000 / 1000 / 1000 > 1
+      labels:
+        severity: warning
+        cluster: {{ $cluster }}
+        env: {{ $env }}
+        tier: application
+        application: radix-connect-relay
+        namespace: {{ .Release.Namespace }}
+      for: 5m
+      annotations:
+        summary: "High memory usage on Redis"
+        description: "The memory usage on Redis is over 1GB"
+        dashboard: {{ .Values.alerts.dashboard_url }}
+        namespace: {{ .Release.Namespace }}
+        runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
+
+    - alert: CriticalMemoryUsageOnRedis
+      expr: redis_memory_used_bytes{namespace={{ .Release.Namespace | quote }}} / 1000 / 1000 / 1000 > 3
+      labels:
+        severity: critical
+        cluster: {{ $cluster }}
+        env: {{ $env }}
+        tier: application
+        application: radix-connect-relay
+        namespace: {{ .Release.Namespace }}
+      for: 5m
+      annotations:
+        summary: "Critical memory usage on Redis"
+        description: "The memory usage on Redis is over 3GB"
+        dashboard: {{ .Values.alerts.dashboard_url }}
+        namespace: {{ .Release.Namespace }}
+        runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
