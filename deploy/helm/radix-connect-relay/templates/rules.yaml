@@ -63,7 +63,7 @@ spec:
         runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
 
     - alert: HighMemoryUsageOnRedis
-      expr: redis_memory_used_bytes{namespace={{ .Release.Namespace | quote }}} / redis_memory_max_bytes{namespace={{ .Release.Namespace | quote }}} * 100 > 60
+      expr: redis_memory_used_bytes{namespace={{ .Release.Namespace | quote }}} / 1000 / 1000 / 1000 > 1
       labels:
         severity: warning
         cluster: {{ $cluster }}
@@ -74,13 +74,13 @@ spec:
       for: 5m
       annotations:
         summary: "High memory usage on Redis"
-        description: "The memory usage on Redis is over 60%"
+        description: "The memory usage on Redis is over 1GB"
         dashboard: {{ .Values.alerts.dashboard_url }}
         namespace: {{ .Release.Namespace }}
         runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
 
     - alert: CriticalMemoryUsageOnRedis
-      expr: redis_memory_used_bytes{namespace={{ .Release.Namespace | quote }}} / redis_memory_max_bytes{namespace={{ .Release.Namespace | quote }}} * 100 > 80
+      expr: redis_memory_used_bytes{namespace={{ .Release.Namespace | quote }}} / 1000 / 1000 / 1000 > 3
       labels:
         severity: critical
         cluster: {{ $cluster }}
@@ -91,7 +91,7 @@ spec:
       for: 5m
       annotations:
         summary: "Critical memory usage on Redis"
-        description: "The memory usage on Redis is over 80%"
+        description: "The memory usage on Redis is over 3GB"
         dashboard: {{ .Values.alerts.dashboard_url }}
         namespace: {{ .Release.Namespace }}
         runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
