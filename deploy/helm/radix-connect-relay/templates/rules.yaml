@@ -46,7 +46,7 @@ spec:
         runbook_url: "https://radixdlt.atlassian.net/wiki/spaces/DT/pages/2563932288/Runbooks"
 
     - alert: HighNumberOfRedisKeys
-      expr: sum (redis_db_keys_expiring{namespace=~{{ .Release.Namespace | quote }}}) by (namespace)
+      expr: sum (redis_db_keys_expiring{namespace=~{{ .Release.Namespace | quote }}}) by (namespace) > 10000
       labels:
         severity: critical
         cluster: {{ $cluster }}
