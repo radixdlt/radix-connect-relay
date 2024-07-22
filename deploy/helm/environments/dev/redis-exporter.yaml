@@ -1,3 +1,3 @@
-redisAddress: redis://radix-connect-relay-dev-redis.rdx-works-main.internal:6379
+redisAddress: redis://common-dev-redis.rdx-works-main.internal:6379
 rbac:
   pspEnabled: false
