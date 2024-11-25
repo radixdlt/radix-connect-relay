@@ -19,6 +19,7 @@ const inMemoryRedis = await RedisServer();
 
 await Server({
   port: "3001",
+  // logger,
   redis: { url: inMemoryRedis.url, password: "", clusterMode: "disabled" },
 });
 
@@ -387,8 +388,27 @@ describe("API", () => {
       expect(response.status).toEqual(400);
     });
 
+    it("should set data near to limit", async () => {
+      const request = {
+        method: "set",
+        channelId: generateSessionId(),
+        data: generateRandomValue(100_000),
+      };
+      const response = await post(request).then(async (res) => ({
+        data: await res.json(),
+        status: res.status,
+      }));
+      expect(response.status).toEqual(400);
+    });
+
     it("should not return channel id if data is empty", async () => {
       const channelIds = [generateSessionId(), generateSessionId()];
+      const randomData1 = generateRandomValue(4);
+      await post({
+        method: "set",
+        channelId: channelIds[0],
+        data: randomData1,
+      });
       const response = await post({ method: "get", channelIds }).then(
         async (res) => ({
           data: await res.json(),
@@ -396,7 +416,12 @@ describe("API", () => {
         })
       );
       expect(response).toEqual({
-        data: [],
+        data: [
+          {
+            channelId: channelIds[0],
+            data: [randomData1],
+          },
+        ],
         status: 200,
       });
     });
@@ -438,6 +463,56 @@ describe("API", () => {
         ],
         status: 200,
       });
+    });
+
+    it("should handle 25 channel ids with 100 items each", async () => {
+      const channelIds = Array.from({ length: 25 }, () => generateSessionId());
+      const randomData = channelIds.reduce((acc, channelId) => {
+        acc[channelId] = {
+          channelId,
+          data: Array.from({ length: 100 }, () => generateRandomValue(50_000)),
+        };
+        return acc;
+      }, {} as Record<string, { channelId: string; data: string[] }>);
+
+      await Promise.all(
+        Object.values(randomData).map(({ channelId, data }) =>
+          Promise.all(
+            data.map((singleDataPack) =>
+              post({
+                method: "set",
+                channelId,
+                data: singleDataPack,
+              })
+            )
+          )
+        )
+      );
+
+      const response: { data: any; status: number } = await post({
+        method: "get",
+        channelIds,
+      }).then(async (res) => ({
+        data: await res.json(),
+        status: res.status,
+      }));
+
+      // As we're inserting data asynchronously they may end up in different order than we have inside randomData
+      // Because of that I'm doing a bit more complex assertions here instead of simple equality check
+      expect(response.status).toEqual(200);
+      expect(response.data.length).toEqual(Object.keys(randomData).length);
+      response.data.forEach(
+        (channelData: { channelId: string; data: string[] }) => {
+          expect(randomData[channelData.channelId]).toBeDefined();
+          expect(channelData.data.length).toEqual(
+            randomData[channelData.channelId].data.length
+          );
+          const responseSet = new Set(channelData.data);
+          randomData[channelData.channelId].data.forEach((data) => {
+            expect(responseSet.has(data)).toBeTruthy();
+          });
+        }
+      );
     });
   });
 });
