@@ -90,6 +90,12 @@ export const GetRequestBody = z.object({
   channelIds: z.array(z.string().regex(channelIdRegex)).max(100),
 });
 
+export type GetResponse = z.infer<typeof GetResponse>;
+export const GetResponse = z.object({
+  channelId: z.string().regex(channelIdRegex),
+  data: z.array(z.string().max(102_400)),
+})
+
 export type SetRequestBody = z.infer<typeof SetRequestBody>;
 export const SetRequestBody = z.object({
   method: z.literal("set"),

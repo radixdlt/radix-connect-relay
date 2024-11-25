@@ -8,10 +8,11 @@ import { Router } from "./router";
 import type {
   GetHandshakeRequestBody,
   GetHandshakeResponseBody,
+  GetResponse,
   SendHandshakeRequestBody,
   SendHandshakeResponseBody,
 } from "./schemas";
-import { httpPost } from "./test-helpers/httpPost";
+import { v2Api } from "./test-helpers/httpPost";
 
 const apiBaseUrl = `http://localhost:3001`;
 
@@ -353,166 +354,135 @@ describe("API", () => {
     });
   });
 
-  describe("/api/v2", () => {
-    const url = `${apiBaseUrl}/api/v2`;
-    const post = httpPost(url);
-    it("should fail for invalid body", async () => {
-      const response = await post({});
+  describe("/api/v2 method SET", () => {
+    const v2 = v2Api(apiBaseUrl);
 
-      expect(response.status).toEqual(400);
-    });
-    it("should set data", async () => {
-      const request = {
-        method: "set",
-        channelId: generateSessionId(),
-        data: generateRandomValue(4),
-      };
-      const response = await post(request).then(async (res) => ({
-        data: await res.json(),
-        status: res.status,
-      }));
-      expect(response).toEqual({ status: 201, data: null });
-      expect(await model.getItems(request.channelId)).toEqual([request.data]);
-    });
-
-    it("should not set data if data is too large", async () => {
-      const request = {
-        method: "set",
-        channelId: generateSessionId(),
-        data: generateRandomValue(102_401),
-      };
-      const response = await post(request).then(async (res) => ({
-        data: await res.json(),
-        status: res.status,
-      }));
-      expect(response.status).toEqual(400);
-    });
-
-    it("should set data near to limit", async () => {
-      const request = {
-        method: "set",
-        channelId: generateSessionId(),
-        data: generateRandomValue(100_000),
-      };
-      const response = await post(request).then(async (res) => ({
-        data: await res.json(),
-        status: res.status,
-      }));
-      expect(response.status).toEqual(400);
-    });
-
-    it("should not return channel id if data is empty", async () => {
-      const channelIds = [generateSessionId(), generateSessionId()];
-      const randomData1 = generateRandomValue(4);
-      await post({
-        method: "set",
-        channelId: channelIds[0],
-        data: randomData1,
+    describe("given empty body", () => {
+      it("should return 400", async () => {
+        const { status } = await v2.post({});
+        expect(status).toEqual(400);
       });
-      const response = await post({ method: "get", channelIds }).then(
-        async (res) => ({
-          data: await res.json(),
-          status: res.status,
-        })
-      );
-      expect(response).toEqual({
-        data: [
+    });
+
+    describe("given too big payload", () => {
+      it("should return 400", async () => {
+        const { status } = await v2.set(
+          generateSessionId(),
+          generateRandomValue(60_000)
+        );
+        expect(status).toEqual(400);
+      });
+    });
+
+    describe("given valid payload", () => {
+      it("should return 201", async () => {
+        const request = {
+          method: "set",
+          channelId: generateSessionId(),
+          data: generateRandomValue(4),
+        };
+        const response = await v2.post(request);
+        expect(response).toEqual({ status: 201, data: null });
+        expect(await model.getItems(request.channelId)).toEqual([request.data]);
+      });
+
+      describe("near to size limit", () => {
+        it("should return 201", async () => {
+          const response = await v2.set(
+            generateSessionId(),
+            generateRandomValue(50_000)
+          );
+          expect(response.status).toEqual(201);
+        });
+      });
+    });
+  });
+  describe("/api/v2 method GET", () => {
+    const v2 = v2Api(apiBaseUrl);
+
+    describe("given multiple channel ids", () => {
+      it("should return data", async () => {
+        const channelIds = [generateSessionId(), generateSessionId()];
+        const randomData = [
+          generateRandomValue(4),
+          generateRandomValue(4),
+          generateRandomValue(4),
+        ];
+
+        await Promise.all([
+          v2.set(channelIds[0], randomData[0]),
+          v2.set(channelIds[0], randomData[2]),
+          v2.set(channelIds[1], randomData[1]),
+        ]);
+
+        const { data } = await v2.get(channelIds);
+
+        expect(data).toEqual([
           {
             channelId: channelIds[0],
-            data: [randomData1],
+            data: [randomData[0], randomData[2]],
           },
-        ],
-        status: 200,
+          { channelId: channelIds[1], data: [randomData[1]] },
+        ]);
       });
     });
 
-    it("should return data", async () => {
-      const channelIds = [generateSessionId(), generateSessionId()];
-      const randomData1 = generateRandomValue(4);
-      const randomData2 = generateRandomValue(4);
-      const randomData3 = generateRandomValue(4);
+    describe("given channel ids which have no data", () => {
+      it("should not include them in the response", async () => {
+        const channelIds = [generateSessionId(), generateSessionId()];
+        const randomData = generateRandomValue(4);
+        await v2.set(channelIds[0], randomData);
 
-      await Promise.all([
-        post({
-          method: "set",
-          channelId: channelIds[0],
-          data: randomData1,
-        }),
-        post({
-          method: "set",
-          channelId: channelIds[0],
-          data: randomData3,
-        }),
-        post({
-          method: "set",
-          channelId: channelIds[1],
-          data: randomData2,
-        }),
-      ]);
+        const { data } = await v2.get(channelIds);
 
-      const response = await post({ method: "get", channelIds }).then(
-        async (res) => ({
-          data: await res.json(),
-          status: res.status,
-        })
-      );
-      expect(response).toEqual({
-        data: [
-          { channelId: channelIds[0], data: [randomData1, randomData3] },
-          { channelId: channelIds[1], data: [randomData2] },
-        ],
-        status: 200,
+        expect(data).toEqual([
+          {
+            channelId: channelIds[0],
+            data: [randomData],
+          },
+        ]);
       });
     });
 
     it("should handle 25 channel ids with 100 items each", async () => {
       const channelIds = Array.from({ length: 25 }, () => generateSessionId());
-      const randomData = channelIds.reduce((acc, channelId) => {
-        acc[channelId] = {
-          channelId,
-          data: Array.from({ length: 100 }, () => generateRandomValue(50_000)),
-        };
-        return acc;
-      }, {} as Record<string, { channelId: string; data: string[] }>);
+      const randomData = channelIds.reduce<Record<string, GetResponse>>(
+        (acc, channelId) => {
+          acc[channelId] = {
+            channelId,
+            data: Array.from({ length: 100 }, () =>
+              generateRandomValue(50_000)
+            ),
+          };
+          return acc;
+        },
+        {}
+      );
 
       await Promise.all(
         Object.values(randomData).map(({ channelId, data }) =>
           Promise.all(
-            data.map((singleDataPack) =>
-              post({
-                method: "set",
-                channelId,
-                data: singleDataPack,
-              })
-            )
+            data.map((singleDataPack) => v2.set(channelId, singleDataPack))
           )
         )
       );
 
-      const response: { data: any; status: number } = await post({
-        method: "get",
-        channelIds,
-      }).then(async (res) => ({
-        data: await res.json(),
-        status: res.status,
-      }));
+      const response = await v2.get(channelIds);
 
       // As we're inserting data asynchronously they may end up in different order than we have inside randomData
       // Because of that I'm doing a bit more complex assertions here instead of simple equality check
       expect(response.status).toEqual(200);
       expect(response.data.length).toEqual(Object.keys(randomData).length);
-      response.data.forEach(
-        (channelData: { channelId: string; data: string[] }) => {
-          expect(randomData[channelData.channelId]).toBeDefined();
-          expect(channelData.data.length).toEqual(
-            randomData[channelData.channelId].data.length
-          );
-          const responseSet = new Set(channelData.data);
-          randomData[channelData.channelId].data.forEach((data) => {
-            expect(responseSet.has(data)).toBeTruthy();
-          });
-        }
-      );
+      response.data.forEach((channelData: GetResponse) => {
+        expect(randomData[channelData.channelId]).toBeDefined();
+        expect(channelData.data.length).toEqual(
+          randomData[channelData.channelId].data.length
+        );
+        const responseSet = new Set(channelData.data);
+        randomData[channelData.channelId].data.forEach((data) => {
+          expect(responseSet.has(data)).toBeTruthy();
+        });
+      });
     });
   });
 });
