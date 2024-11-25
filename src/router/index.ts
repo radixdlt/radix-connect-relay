@@ -1,5 +1,5 @@
 import type { Controller } from "../controller";
-import { logger } from "../logger";
+import type { Logger } from "pino";
 import { invalidRequest } from "./helpers/invalidRequest";
 import { notFoundResponse } from "./helpers/notFoundResponse";
 import { RouteHandler } from "./helpers/routeHandler";
@@ -20,7 +20,7 @@ import {
 } from "../metrics/metrics";
 
 export const Router =
-  ({ controller }: { controller: Controller }) =>
+  ({ controller, logger }: { controller: Controller; logger?: Logger }) =>
   async (req: Request): Promise<Response> => {
     const url = new URL(req.url);
     const path = url.pathname;
@@ -37,14 +37,14 @@ export const Router =
     if (rawRequestBody.error) return invalidRequest;
 
     const getRouteHandler = (data: { method: string }) => {
-      logger.debug({
+      logger?.debug({
         path,
         httpMethod: req.method,
         requestBody: data,
       });
 
       return RouteHandler(
-        logger.child({ method: data.method, path: url.pathname })
+        logger?.child({ method: data.method, path: url.pathname })
       );
     };
 
