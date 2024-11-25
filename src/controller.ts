@@ -69,7 +69,28 @@ export const Controller = ({ model }: { model: Model }) => {
     return { data: { publicKey }, status: 200 };
   };
 
+  const setData = async (channelId: string, data: string) => {
+    await model.setItem(channelId, data);
+    return { status: 201 };
+  };
+
+  const getData = async (channelIds: string[]) => {
+    return {
+      data: (
+        await Promise.all(
+          channelIds.map(async (channelId) => {
+            const data = await model.getItems(channelId);
+            return data?.length ? { channelId, data } : undefined;
+          })
+        )
+      ).filter(Boolean),
+      status: 200,
+    };
+  };
+
   return {
+    setData,
+    getData,
     addRequest,
     getRequests,
     addResponse,

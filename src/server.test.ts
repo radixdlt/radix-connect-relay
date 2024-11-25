@@ -11,6 +11,7 @@ import type {
   SendHandshakeRequestBody,
   SendHandshakeResponseBody,
 } from "./schemas";
+import { httpPost } from "./test-helpers/httpPost";
 
 const apiBaseUrl = `http://localhost:3001`;
 
@@ -347,6 +348,95 @@ describe("API", () => {
           status: 200,
           data: { publicKey: undefined },
         });
+      });
+    });
+  });
+
+  describe("/api/v2", () => {
+    const url = `${apiBaseUrl}/api/v2`;
+    const post = httpPost(url);
+    it("should fail for invalid body", async () => {
+      const response = await post({});
+
+      expect(response.status).toEqual(400);
+    });
+    it("should set data", async () => {
+      const request = {
+        method: "set",
+        channelId: generateSessionId(),
+        data: generateRandomValue(4),
+      };
+      const response = await post(request).then(async (res) => ({
+        data: await res.json(),
+        status: res.status,
+      }));
+      expect(response).toEqual({ status: 201, data: null });
+      expect(await model.getItems(request.channelId)).toEqual([request.data]);
+    });
+
+    it("should not set data if data is too large", async () => {
+      const request = {
+        method: "set",
+        channelId: generateSessionId(),
+        data: generateRandomValue(102_401),
+      };
+      const response = await post(request).then(async (res) => ({
+        data: await res.json(),
+        status: res.status,
+      }));
+      expect(response.status).toEqual(400);
+    });
+
+    it("should not return channel id if data is empty", async () => {
+      const channelIds = [generateSessionId(), generateSessionId()];
+      const response = await post({ method: "get", channelIds }).then(
+        async (res) => ({
+          data: await res.json(),
+          status: res.status,
+        })
+      );
+      expect(response).toEqual({
+        data: [],
+        status: 200,
+      });
+    });
+
+    it("should return data", async () => {
+      const channelIds = [generateSessionId(), generateSessionId()];
+      const randomData1 = generateRandomValue(4);
+      const randomData2 = generateRandomValue(4);
+      const randomData3 = generateRandomValue(4);
+
+      await Promise.all([
+        post({
+          method: "set",
+          channelId: channelIds[0],
+          data: randomData1,
+        }),
+        post({
+          method: "set",
+          channelId: channelIds[0],
+          data: randomData3,
+        }),
+        post({
+          method: "set",
+          channelId: channelIds[1],
+          data: randomData2,
+        }),
+      ]);
+
+      const response = await post({ method: "get", channelIds }).then(
+        async (res) => ({
+          data: await res.json(),
+          status: res.status,
+        })
+      );
+      expect(response).toEqual({
+        data: [
+          { channelId: channelIds[0], data: [randomData1, randomData3] },
+          { channelId: channelIds[1], data: [randomData2] },
+        ],
+        status: 200,
       });
     });
   });

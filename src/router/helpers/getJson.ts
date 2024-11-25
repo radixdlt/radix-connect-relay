@@ -1,5 +1,3 @@
-import { Logger } from "../../logger";
-
 export const getRequestBody = async (request: Request) => {
   try {
     return { data: await request.json() };

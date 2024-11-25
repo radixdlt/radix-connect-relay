@@ -15,6 +15,16 @@ export const getResponsesCounter = new client.Counter({
   help: "The number of requests to get relay responses",
 });
 
+export const getDataCounter = new client.Counter({
+  name: "radix_connect_relay_get_data_count",
+  help: "The number of HTTP requests to get data",
+});
+
+export const setDataCounter = new client.Counter({
+  name: "radix_connect_relay_set_data_count",
+  help: "The number of HTTP requests to set data",
+});
+
 export const getRequestsCounter = new client.Counter({
   name: "radix_connect_relay_get_requests_count",
   help: "The number of requests to get relay requests",
