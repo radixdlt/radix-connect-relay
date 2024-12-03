@@ -364,16 +364,6 @@ describe("API", () => {
       });
     });
 
-    describe("given too big payload", () => {
-      it("should return 400", async () => {
-        const { status } = await v2.set(
-          generateSessionId(),
-          generateRandomValue(60_000)
-        );
-        expect(status).toEqual(400);
-      });
-    });
-
     describe("given valid payload", () => {
       it("should return 201", async () => {
         const request = {
