@@ -40,7 +40,6 @@ export const Router =
       logger?.debug({
         path,
         httpMethod: req.method,
-        requestBody: data,
       });
 
       return RouteHandler(
