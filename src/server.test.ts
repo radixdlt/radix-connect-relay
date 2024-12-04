@@ -434,8 +434,8 @@ describe("API", () => {
       });
     });
 
-    it("should handle 25 channel ids with 100 items each", async () => {
-      const channelIds = Array.from({ length: 25 }, () => generateSessionId());
+    it("should handle 100 channel ids with 100 items each", async () => {
+      const channelIds = Array.from({ length: 100 }, () => generateSessionId());
       const randomData = channelIds.reduce<Record<string, GetResponse>>(
         (acc, channelId) => {
           acc[channelId] = {
