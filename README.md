@@ -182,6 +182,64 @@ string[]
 </td>
 </table>
 
+
+## API V2
+
+The Radix Connect Relay supports the `POST /api/v2` endpoint. The server executes code based on the `method` key in the request body. Multiple packs of stringified data can be stored for single `channelId`. As a result, response for method `get` is an array of objects, each one containing `channelId` and corresponding array of `data`
+
+Once data is retrieved for a specific `channelId` it is immediately removed from the Redis storage. Therefore, it is not possible to access the same data multiple times. Maximum size of single chunk of data is 100kB. Data is removed from redis storage after TTL (currently set to 10 minutes). `channelId` is required to be a hexadecimal string (and hyphens) between `32` to `64` characters
+
+<table>
+<tr>
+  <td><strong>Name</strong></td>
+  <td><strong>Request Body</strong></td>
+  <td><strong>Response Status</strong></td>
+  <td><strong>Response Body</strong></td>
+</tr>
+<tr>
+  <td><strong>Set Data</strong></td>
+  <td>
+
+```typescript
+{
+  method: "set",
+  channelId: string,
+  data: string
+}
+```
+
+</td>
+<td><strong>201</strong>
+</td>
+<td><i>empty</i></td>
+</tr>
+<tr>
+  <td><strong>Get Data</strong></td>
+  <td>
+
+```typescript
+{
+  method: "get",
+  channelIds: string[]
+}
+```
+
+</td>
+<td><strong>200</strong></td>
+<td>
+
+```typescript
+{
+  channelId: string;
+  data: string[]
+}[]
+```
+
+</td>
+</tr>
+
+</table>
+
 ### Error responses
 
 <table>
@@ -216,7 +274,7 @@ When request body is invalid or does not pass `zod` validation
 </td>
 <td>
 
-When anything other than `POST /api/v1` or `GET /` is requested
+When anything other than `POST /api/v1`, `POST /api/v2`, `GET /` or `GET /metrics` is requested
 
 </td>
 </tr>
@@ -254,28 +312,3 @@ _Prometheus metrics_
 </tr>
 </table>
 
-### Error responses
-
-<table>
-<tr>
-<td><strong>HTTP Code</strog></td>
-<td><strong>Response</strong></td>
-<td><strong>Description</strong></td>
-</tr>
-<tr>
-<td><strong>404</strong></td>
-<td>
-
-```json
-{ "error": "Not Found" }
-```
-
-</td>
-<td>
-
-When anything other than `GET /` or `GET /metrics` is requested
-
-</td>
-</tr>
-
-</table>

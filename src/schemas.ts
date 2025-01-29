@@ -1,5 +1,7 @@
 import z from "zod";
 
+const channelIdRegex = /^[0-9a-fA-F-]{32,64}$/;
+
 export type SendRequestBody = z.infer<typeof SendRequestBody>;
 export const SendRequestBody = z.object({
   method: z.literal("sendRequest"),
@@ -81,3 +83,28 @@ export const ApiV1Requests = z.union([
   SendHandshakeResponseBody,
   GetHandshakeResponseBody,
 ]);
+
+export type GetRequestBody = z.infer<typeof GetRequestBody>;
+export const GetRequestBody = z.object({
+  method: z.literal("get"),
+  channelIds: z.array(z.string().regex(channelIdRegex)).max(100),
+});
+
+export type GetResponse = z.infer<typeof GetResponse>;
+export const GetResponse = z.object({
+  channelId: z.string().regex(channelIdRegex),
+  data: z.array(z.string()),
+})
+
+export type SetRequestBody = z.infer<typeof SetRequestBody>;
+export const SetRequestBody = z.object({
+  method: z.literal("set"),
+  channelId: z.string().regex(channelIdRegex),
+  data: z.string(),
+});
+
+export type ApiV2Request = z.infer<typeof ApiV2Request>;
+export const ApiV2Request = z.union([GetRequestBody, SetRequestBody]);
+
+export type ApiRequest = z.infer<typeof ApiRequest>;
+export const ApiRequest = z.union([ApiV1Requests, ApiV2Request]);

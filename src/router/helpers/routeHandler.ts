@@ -2,11 +2,11 @@ import type { Logger } from "pino";
 import { responseSizeHistogram } from "../../metrics/metrics";
 
 export const RouteHandler =
-  (logger: Logger) =>
+  (logger?: Logger) =>
   ({ data, status }: { data?: any; status: number }) => {
     const stringifiedData = data !== undefined ? JSON.stringify(data) : data;
     responseSizeHistogram.observe(stringifiedData?.length || 0);
-    logger.debug({ status, response: data });
+    logger?.debug({ status });
     return new Response(stringifiedData, {
       status: status,
       headers: {

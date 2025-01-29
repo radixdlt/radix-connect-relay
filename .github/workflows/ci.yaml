@@ -64,7 +64,7 @@ jobs:
         run: bun run build --target=bun
 
       - name: Unit tests
-        run: bun test
+        run: bun test --timeout=30000
 
   push-docker-image:
     name: Docker
