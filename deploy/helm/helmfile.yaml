@@ -1,18 +1,16 @@
 ---
 helmDefaults:
   verify: false
-  wait: false
-  timeout: 600
+  wait: true
+  timeout: 90
   recreatePods: false
   force: false
   createNamespace: false
-
 ---
 environments:
   dev: {}
   pr: {}
   prod: {}
-
 ---
 repositories:
   - name: bitnami
