@@ -101,7 +101,7 @@ jobs:
       create_subnamespace: "true"
       kubernetes_namespace: "radix-connect-relay-pr-${{ github.event.number }}"
       aws_eks_cluster: "rdx-works-main-dev"
-      aws_iam_role_name: "gh-radix-connect-relay-pr-deployer"
+      aws_iam_role_name: "jenkins-radix-connect-relay-pr-deployer"
       helmfile_environment: "pr"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
@@ -126,7 +126,7 @@ jobs:
       create_subnamespace: "false"
       kubernetes_namespace: "radix-connect-relay-dev"
       aws_eks_cluster: "rdx-works-main-dev"
-      aws_iam_role_name: "gh-radix-connect-relay-dev-deployer"
+      aws_iam_role_name: "jenkins-radix-connect-relay-dev-deployer"
       helmfile_environment: "dev"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
@@ -150,7 +150,7 @@ jobs:
       application_name: "radix-connect-relay"
       kubernetes_namespace: "radix-connect-relay-prod"
       aws_eks_cluster: "rtlj-prod"
-      aws_iam_role_name: "gh-radix-connect-relay-prod-deployer"
+      aws_iam_role_name: "jenkins-radix-connect-relay-prod-deployer"
       helmfile_environment: "prod"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
