@@ -89,71 +89,73 @@ jobs:
   deploy-pull-request:
     if: ${{ github.event.pull_request }}
     name: "Deploy PR"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/jenkins-deployment.yml@main
     needs:
       - setup-tags
       - push-docker-image
     with:
-      env_name: pr
-      hierarchical_namespace: radix-connect-relay-ci-pr
-      namespace: radix-connect-relay-pr-${{ github.event.number }}
-      helm_command: "apply"
-      create_subns: true
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: "arn:aws:iam::308190735829:role/gh-radix-connect-relay-pr-deployer"
-      eks_cluster: rdx-works-main-dev
-      helm_folder: "deploy/helm/"
+      jenkins_job_name: "kubernetes-deployments/job/radix-connect-relay"
+      github_branch: "${{ github.head_ref }}"
+      application_name: "radix-connect-relay"
+      hierarchical_namespace: "radix-connect-relay-ci-pr"
+      create_subnamespace: "true"
+      kubernetes_namespace: "radix-connect-relay-pr-${{ github.event.number }}"
+      aws_eks_cluster: "rdx-works-main-dev"
+      aws_iam_role_name: "jenkins-radix-connect-relay-pr-deployer"
+      helmfile_environment: "pr"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
-        ci.prNumber=${{ github.event.number }}
-      app_name: "radix-connect-relay"
-      step_name: "deploy-pr"
+        ci.prNumber=${{ github.event.number }},
+        ci.environment=pr
+    secrets:
+      aws_deployment_account_id: ${{ secrets.AWS_DEV_ACCOUNT_ID }}
+      secrets_account_id: ${{ secrets.SECRETS_ACCOUNT_ID }}
 
   deploy-dev:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     name: "Deploy DEV"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/jenkins-deployment.yml@main
     needs:
       - setup-tags
       - push-docker-image
     with:
-      app_name: "radix-connect-relay"
-      step_name: "deploy-radix-connect-relay-dev"
-      env_name: dev
-      namespace: radix-connect-relay-dev
-      helm_command: "apply"
-      create_subns: false
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: arn:aws:iam::308190735829:role/gh-radix-connect-relay-dev-deployer
-      eks_cluster: rdx-works-main-dev
-      helm_folder: "deploy/helm"
+      jenkins_job_name: "kubernetes-deployments/job/radix-connect-relay"
+      github_branch: "${{ github.ref }}"
+      application_name: "radix-connect-relay"
+      hierarchical_namespace: "radix-connect-relay-dev"
+      create_subnamespace: "false"
+      kubernetes_namespace: "radix-connect-relay-dev"
+      aws_eks_cluster: "rdx-works-main-dev"
+      aws_iam_role_name: "jenkins-radix-connect-relay-dev-deployer"
+      helmfile_environment: "dev"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.environment=dev,
         ci.HF_CREATE_NAMESPACES=false
+    secrets:
+      aws_deployment_account_id: ${{ secrets.AWS_DEV_ACCOUNT_ID }}
+      secrets_account_id: ${{ secrets.SECRETS_ACCOUNT_ID }}
 
   deploy-prod:
     if: github.event_name == 'release' && github.event.action == 'released'
     name: "Deploy PROD"
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/deploy.yml@main
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/jenkins-deployment.yml@main
     needs:
       - setup-tags
       - push-docker-image
     with:
-      app_name: "radix-connect-relay"
-      step_name: "deploy-radix-connect-relay-prod"
-      env_name: prod
-      namespace: radix-connect-relay-prod
-      helm_command: "apply"
-      create_subns: false
-      restart_pods: false
-      aws_region: eu-west-2
-      role_to_assume: arn:aws:iam::821496737932:role/gh-radix-connect-relay-prod-deployer
-      eks_cluster: rtlj-prod
-      helm_folder: "deploy/helm"
+      github_environment: "prod"
+      github_branch: "${{ github.ref }}"
+      jenkins_job_name: "kubernetes-deployments/job/radix-connect-relay"
+      application_name: "radix-connect-relay"
+      kubernetes_namespace: "radix-connect-relay-prod"
+      aws_eks_cluster: "rtlj-prod"
+      aws_iam_role_name: "jenkins-radix-connect-relay-prod-deployer"
+      helmfile_environment: "prod"
       helmfile_extra_vars: >-
         ci.tag=${{ fromJSON(needs.setup-tags.outputs.json).labels['org.opencontainers.image.version'] }},
         ci.environment=prod,
         ci.HF_CREATE_NAMESPACES=false
+    secrets:
+      aws_deployment_account_id: ${{ secrets.AWS_PROD_ACCOUNT_ID }}
+      secrets_account_id: ${{ secrets.SECRETS_ACCOUNT_ID }}
