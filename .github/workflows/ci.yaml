@@ -80,7 +80,7 @@ jobs:
         type=semver,pattern={{version}}
       context: "."
       dockerfile: "Dockerfile"
-      platforms: "linux/amd64"
+      platforms: "linux/amd64,linux/arm64"
       scan_image: true
       provenance: false
       snyk_target_ref: ${{ github.ref_name }}
